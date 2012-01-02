@@ -20,9 +20,15 @@ package de.minestar.illuminati.database;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
+import com.bukkit.gemo.utils.UtilPermissions;
+
+import de.minestar.illuminati.data.Group;
 import de.minestar.illuminati.utils.ChatUtils;
 
 public class DatabaseHandler {
@@ -30,7 +36,8 @@ public class DatabaseHandler {
     private DatabaseConnection dbConnection;
 
     // Prepared Statements
-
+    private PreparedStatement addLogin;
+    private PreparedStatement addLogout;
     // /Prepared Statements
 
     public DatabaseHandler(File dataFolder) {
@@ -81,19 +88,47 @@ public class DatabaseHandler {
                 "  `player` VARCHAR(45) NOT NULL ," +
                 "  `loginGroup` INT NOT NULL ," +
                 "  `loginTime` DATETIME NOT NULL ," +
-                "  `logoutGroup` INT NOT NULL ," +
-                "  `logoutTime` DATETIME NOT NULL ," +
+                "  `logoutGroup` INT ," +
+                "  `logoutTime` DATETIME ," +
                 "  PRIMARY KEY (`id`) )" +
                 "ENGINE = InnoDB;");
-        // @formatter: on
+        // @formatter:on
     }
 
     private void createStatements() throws Exception {
-
+        Connection con = dbConnection.getConnection();
+        addLogin = con.prepareStatement("INSERT INTO stats (player,loginGroup,loginTime) VALUES(?,?,NOW())", Statement.RETURN_GENERATED_KEYS);
+        addLogout = con.prepareStatement("UPDATE stats SET logoutGroup = ? , logoutTime = NOW() WHERE id = ?");
     }
 
     public void closeConnection() {
         dbConnection.closeConnection();
     }
 
+    public int addLogin(Player player) {
+        Group g = null;
+        try {
+            g = Group.getGroup(UtilPermissions.getGroupName(player));
+            addLogin.setString(1, player.getName());
+            addLogin.setInt(2, g.ordinal());
+            addLogin.executeUpdate();
+            return addLogin.getGeneratedKeys().getInt(1);
+        } catch (Exception e) {
+            ChatUtils.printConsoleException(e, "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+        }
+        return -1;
+    }
+
+    public boolean addLogout(Player player, int id) {
+        Group g = null;
+        try {
+            g = Group.getGroup(UtilPermissions.getGroupName(player));
+            addLogout.setInt(1, g.ordinal());
+            addLogout.setInt(2, id);
+            return addLogout.executeUpdate() == 1;
+        } catch (Exception e) {
+            ChatUtils.printConsoleException(e, "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+        }
+        return false;
+    }
 }

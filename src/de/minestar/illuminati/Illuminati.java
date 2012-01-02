@@ -21,9 +21,14 @@ package de.minestar.illuminati;
 
 import java.io.File;
 
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
+import org.bukkit.event.player.PlayerListener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.minestar.illuminati.database.DatabaseHandler;
+import de.minestar.illuminati.listener.JoinQuitListener;
 import de.minestar.illuminati.utils.ChatUtils;
 
 public class Illuminati extends JavaPlugin {
@@ -41,9 +46,14 @@ public class Illuminati extends JavaPlugin {
 
         File dataFolder = getDataFolder();
         dataFolder.mkdirs();
+
         dbHandler = new DatabaseHandler(dataFolder);
+
+        PluginManager pm = getServer().getPluginManager();
+        PlayerListener joinQuit = new JoinQuitListener(dbHandler);
+        pm.registerEvent(Type.PLAYER_JOIN, joinQuit, Priority.Highest, this);
+        pm.registerEvent(Type.PLAYER_QUIT, joinQuit, Priority.Highest, this);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
     }
-
 }
