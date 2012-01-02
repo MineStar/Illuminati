@@ -19,19 +19,29 @@
 
 package de.minestar.illuminati;
 
+import java.io.File;
+
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.utils.ChatUtils;
 
 public class Illuminati extends JavaPlugin {
 
+    private DatabaseHandler dbHandler;
+
     @Override
     public void onDisable() {
+        dbHandler.closeConnection();
         ChatUtils.printConsoleInfo("Disabled!");
     }
 
     @Override
     public void onEnable() {
+
+        File dataFolder = getDataFolder();
+        dataFolder.mkdirs();
+        dbHandler = new DatabaseHandler(dataFolder);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
     }
