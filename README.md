@@ -1,7 +1,7 @@
 Illuminati
 ============
 
-Quis custodiet ipsos custodes!
+Quis custodiet ipsos custodes?
 
 Server website: http://www.minestar.de
 

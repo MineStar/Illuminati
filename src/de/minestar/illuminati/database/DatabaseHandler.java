@@ -57,6 +57,7 @@ public class DatabaseHandler {
     private void createConnection(File dataFolder) throws Exception {
         YamlConfiguration config = new YamlConfiguration();
         File configFile = new File(dataFolder, "sqlconfig.yml");
+
         if (!configFile.exists()) {
             configFile.createNewFile();
             ChatUtils.printConsoleError("Can't find SQL Configuration in " + configFile.toString() + "! Creating a default one! Please restart server after configured SQL connection!");
@@ -69,11 +70,15 @@ public class DatabaseHandler {
             config.save(configFile);
             return;
         }
-        String[] conInfos = {config.getString("host"), config.getString("port"), config.getString("database"), config.getString("user"), config.getString("password")};
+
+        config.load(configFile);
+        String[] conInfos = {config.getString("host"), Integer.toString(config.getInt("port")), config.getString("database"), config.getString("user"), config.getString("password")};
+
         for (String info : conInfos)
             if (info == null || info.isEmpty()) {
                 ChatUtils.printConsoleError("SQL configuration is incomplete! Please complete connection information in " + configFile.toString() + " and restart server!");
             }
+
         dbConnection = new DatabaseConnection(conInfos[0], conInfos[1], conInfos[2], conInfos[3], conInfos[4]);
         conInfos = null;
         System.gc();
