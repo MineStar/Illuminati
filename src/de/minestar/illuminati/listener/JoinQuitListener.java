@@ -22,6 +22,7 @@ import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -41,12 +42,13 @@ public class JoinQuitListener extends PlayerListener {
     }
 
     @Override
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerKick(PlayerKickEvent event) {
+        addLogout(event.getPlayer());
+    }
 
-        Player p = event.getPlayer();
-        Integer id = tableIDs.remove(p.getName());
-        if (!(id != null && dbHandler.addLogout(p, id)))
-            ChatUtils.printConsoleError("Can't add logout information for User '" + p.getName() + "'!");
+    @Override
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        addLogout(event.getPlayer());
     }
 
     @Override
@@ -58,5 +60,13 @@ public class JoinQuitListener extends PlayerListener {
             ChatUtils.printConsoleError("Can't add login information for User '" + p.getName() + "'!");
         else
             tableIDs.put(p.getName(), Integer.valueOf(id));
+    }
+
+    private void addLogout(Player player) {
+        Integer id = tableIDs.remove(player.getName());
+        if (id == null)
+            return;
+        if (!dbHandler.addLogout(player, id))
+            ChatUtils.printConsoleError("Can't add logout information for User '" + player.getName() + "'!");
     }
 }

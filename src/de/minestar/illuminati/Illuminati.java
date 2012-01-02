@@ -53,6 +53,7 @@ public class Illuminati extends JavaPlugin {
         PlayerListener joinQuit = new JoinQuitListener(dbHandler);
         pm.registerEvent(Type.PLAYER_JOIN, joinQuit, Priority.Highest, this);
         pm.registerEvent(Type.PLAYER_QUIT, joinQuit, Priority.Highest, this);
+        pm.registerEvent(Type.PLAYER_KICK, joinQuit, Priority.Highest, this);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
     }

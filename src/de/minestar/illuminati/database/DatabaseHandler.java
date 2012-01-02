@@ -21,6 +21,7 @@ package de.minestar.illuminati.database;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -117,7 +118,10 @@ public class DatabaseHandler {
             addLogin.setString(1, player.getName());
             addLogin.setInt(2, g.ordinal());
             addLogin.executeUpdate();
-            return addLogin.getGeneratedKeys().getInt(1);
+            ResultSet rs = addLogin.getGeneratedKeys();
+            if (!rs.next())
+                return -1;
+            return rs.getInt(1);
         } catch (Exception e) {
             ChatUtils.printConsoleException(e, "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
         }
