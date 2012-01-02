@@ -89,7 +89,7 @@ public class DatabaseHandler {
         Connection con = dbConnection.getConnection();
         // @formatter:off
         con.createStatement().execute(
-                "CREATE  TABLE IF NOT EXISTS `mc_illuminati`.`stats` (" +
+                "CREATE  TABLE IF NOT EXISTS `stats` (" +
                 "  `id` INT NOT NULL AUTO_INCREMENT ," +
                 "  `player` VARCHAR(45) NOT NULL ," +
                 "  `loginGroup` INT NOT NULL ," +
