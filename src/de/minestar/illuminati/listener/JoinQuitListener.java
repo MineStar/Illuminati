@@ -44,7 +44,7 @@ public class JoinQuitListener extends PlayerListener {
     public void onPlayerQuit(PlayerQuitEvent event) {
 
         Player p = event.getPlayer();
-        Integer id = tableIDs.get(p.getName());
+        Integer id = tableIDs.remove(p.getName());
         if (!(id != null && dbHandler.addLogout(p, id)))
             ChatUtils.printConsoleError("Can't add logout information for User '" + p.getName() + "'!");
     }
