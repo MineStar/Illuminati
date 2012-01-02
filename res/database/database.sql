@@ -13,8 +13,8 @@ CREATE  TABLE IF NOT EXISTS `mc_illuminati`.`stats` (
   `player` VARCHAR(45) NOT NULL ,
   `loginGroup` INT NOT NULL ,
   `loginTime` DATETIME NOT NULL ,
-  `logoutGroup` INT NOT NULL ,
-  `logoutTime` DATETIME NOT NULL ,
+  `logoutGroup` INT ,
+  `logoutTime` DATETIME ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB;
 
