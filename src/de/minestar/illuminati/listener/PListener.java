@@ -18,27 +18,21 @@
 
 package de.minestar.illuminati.listener;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import de.minestar.illuminati.database.DatabaseHandler;
-import de.minestar.illuminati.utils.ChatUtils;
+import de.minestar.illuminati.manager.PlayerManager;
 
-public class JoinQuitListener extends PlayerListener {
+public class PListener extends PlayerListener {
 
-    // Store autogenerate key from login table update to store logout time/
-    // group in same entry
-    private HashMap<String, Integer> tableIDs = new HashMap<String, Integer>();
+    private PlayerManager pManager;
 
-    private DatabaseHandler dbHandler;
-
-    public JoinQuitListener(DatabaseHandler dbHandler) {
-        this.dbHandler = dbHandler;
+    public PListener(PlayerManager pManager) {
+        this.pManager = pManager;
     }
 
     @Override
@@ -54,19 +48,20 @@ public class JoinQuitListener extends PlayerListener {
     @Override
     public void onPlayerJoin(PlayerJoinEvent event) {
 
-        Player p = event.getPlayer();
-        int id = dbHandler.addLogin(p);
-        if (id == -1)
-            ChatUtils.printConsoleError("Can't add login information for User '" + p.getName() + "'!");
-        else
-            tableIDs.put(p.getName(), Integer.valueOf(id));
+        pManager.handleLogin(event.getPlayer());
     }
 
-    private void addLogout(Player player) {
-        Integer id = tableIDs.remove(player.getName());
-        if (id == null)
-            return;
-        if (!dbHandler.addLogout(player, id))
-            ChatUtils.printConsoleError("Can't add logout information for User '" + player.getName() + "'!");
+    private void addLogout(Player p) {
+        pManager.handleLogout(p);
+    }
+
+    @Override
+    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
+        if (event.getPlayer().isOp()) {
+            if (event.getMessage().toLowerCase().startsWith("/stop"))
+                pManager.logoutAll(event.getPlayer().getServer());
+            else if (event.getMessage().toLowerCase().startsWith("/reload"))
+                pManager.writeLogins();
+        }
     }
 }

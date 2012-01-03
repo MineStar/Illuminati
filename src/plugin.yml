@@ -1,4 +1,4 @@
 name: Illuminati
 main: de.minestar.illuminati.Illuminati
-version: 0.0.0.1
+version: 0.1
 depend: [GroupManager]

@@ -28,16 +28,21 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.minestar.illuminati.database.DatabaseHandler;
-import de.minestar.illuminati.listener.JoinQuitListener;
+import de.minestar.illuminati.listener.PListener;
+import de.minestar.illuminati.listener.ServerCommandListener;
+import de.minestar.illuminati.manager.PlayerManager;
 import de.minestar.illuminati.utils.ChatUtils;
 
 public class Illuminati extends JavaPlugin {
 
     private DatabaseHandler dbHandler;
+    private PlayerManager pManager;
 
     @Override
     public void onDisable() {
         dbHandler.closeConnection();
+        dbHandler = null;
+        pManager = null;
         ChatUtils.printConsoleInfo("Disabled!");
     }
 
@@ -48,12 +53,17 @@ public class Illuminati extends JavaPlugin {
         dataFolder.mkdirs();
 
         dbHandler = new DatabaseHandler(dataFolder);
+        pManager = new PlayerManager(dbHandler, dataFolder);
 
         PluginManager pm = getServer().getPluginManager();
-        PlayerListener joinQuit = new JoinQuitListener(dbHandler);
-        pm.registerEvent(Type.PLAYER_JOIN, joinQuit, Priority.Highest, this);
-        pm.registerEvent(Type.PLAYER_QUIT, joinQuit, Priority.Highest, this);
-        pm.registerEvent(Type.PLAYER_KICK, joinQuit, Priority.Highest, this);
+
+        PlayerListener pListener = new PListener(pManager);
+        pm.registerEvent(Type.PLAYER_JOIN, pListener, Priority.Highest, this);
+        pm.registerEvent(Type.PLAYER_QUIT, pListener, Priority.Highest, this);
+        pm.registerEvent(Type.PLAYER_KICK, pListener, Priority.Highest, this);
+        pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, pListener, Priority.Highest, this);
+
+        pm.registerEvent(Type.SERVER_COMMAND, new ServerCommandListener(pManager), Priority.Normal, this);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
     }
