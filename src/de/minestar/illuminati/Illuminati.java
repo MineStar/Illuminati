@@ -31,12 +31,15 @@ import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.listener.PListener;
 import de.minestar.illuminati.listener.ServerCommandListener;
 import de.minestar.illuminati.manager.PlayerManager;
+import de.minestar.illuminati.manager.TimeManager;
 import de.minestar.illuminati.utils.ChatUtils;
 
 public class Illuminati extends JavaPlugin {
 
     private DatabaseHandler dbHandler;
     private PlayerManager pManager;
+
+    private static TimeManager timeManager;
 
     @Override
     public void onDisable() {
@@ -52,6 +55,8 @@ public class Illuminati extends JavaPlugin {
         File dataFolder = getDataFolder();
         dataFolder.mkdirs();
 
+        timeManager = new TimeManager();
+
         dbHandler = new DatabaseHandler(dataFolder);
         pManager = new PlayerManager(dbHandler, dataFolder);
 
@@ -66,5 +71,9 @@ public class Illuminati extends JavaPlugin {
         pm.registerEvent(Type.SERVER_COMMAND, new ServerCommandListener(pManager), Priority.Normal, this);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
+    }
+
+    public static TimeManager getTimeManager() {
+        return timeManager;
     }
 }
