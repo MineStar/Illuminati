@@ -20,22 +20,51 @@ package de.minestar.illuminati.manager;
 
 import java.util.HashMap;
 
+import org.bukkit.event.Event;
+
 public class TimeManager {
     private HashMap<String, Long> maxTimes = new HashMap<String, Long>();
     private HashMap<String, Long> minTimes = new HashMap<String, Long>();
+    private HashMap<String, Long> EventStartTime = new HashMap<String, Long>();
 
-    public void updateMaxTime(String name, long thisTime) {
+    public void EventHasStarted(Event event, long thisTime) {
+        this.EventHasStarted(event.getClass().getCanonicalName(), thisTime);
+    }
+
+    public void EventHasEnded(Event event, long thisTime) {
+        this.EventHasEnded(event.getClass().getCanonicalName(), thisTime);
+    }
+
+    public void EventHasStarted(String name, long thisTime) {
+        this.EventStartTime.put(name, thisTime);
+    }
+
+    public void EventHasEnded(String name, long thisTime) {
+        long difference = thisTime - EventStartTime.get(name);
+        this.updateMaxTime(name, difference);
+        this.updateMinTime(name, difference);
+    }
+
+    private void updateMaxTime(String name, long thisTime) {
         long oldTime = this.getMaxTime(name);
-        if (oldTime < thisTime) {
+        if (oldTime <= thisTime) {
             this.setMaxTime(name, thisTime);
         }
     }
 
-    public void updateMinTime(String name, long thisTime) {
+    private void updateMinTime(String name, long thisTime) {
         long oldTime = this.getMinTime(name);
-        if (thisTime < oldTime) {
+        if (thisTime <= oldTime) {
             this.setMinTime(name, thisTime);
         }
+    }
+
+    public void updateMaxTime(Event event, long thisTime) {
+        this.updateMaxTime(event.getClass().getCanonicalName(), thisTime);
+    }
+
+    public void updateMinTime(Event event, long thisTime) {
+        this.updateMinTime(event.getClass().getCanonicalName(), thisTime);
     }
 
     private long getMaxTime(String name) {
