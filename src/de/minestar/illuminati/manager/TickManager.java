@@ -19,14 +19,14 @@
 package de.minestar.illuminati.manager;
 
 public class TickManager implements Runnable {
-    private int ticks = 0;
+    private long ticks = 0;
 
     @Override
     public void run() {
         ticks++;
     }
 
-    public int getTickCount() {
+    public long getTickCount() {
         return this.ticks;
     }
 }
