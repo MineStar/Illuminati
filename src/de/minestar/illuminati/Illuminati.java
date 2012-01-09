@@ -21,6 +21,7 @@ package de.minestar.illuminati;
 
 import java.io.File;
 
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.player.PlayerListener;
@@ -31,6 +32,7 @@ import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.listener.PListener;
 import de.minestar.illuminati.listener.ServerCommandListener;
 import de.minestar.illuminati.manager.PlayerManager;
+import de.minestar.illuminati.manager.TickManager;
 import de.minestar.illuminati.manager.TimeManager;
 import de.minestar.illuminati.utils.ChatUtils;
 
@@ -69,6 +71,8 @@ public class Illuminati extends JavaPlugin {
         pm.registerEvent(Type.PLAYER_COMMAND_PREPROCESS, pListener, Priority.Highest, this);
 
         pm.registerEvent(Type.SERVER_COMMAND, new ServerCommandListener(pManager), Priority.Normal, this);
+
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickManager(), 20, 1);
 
         ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
     }

@@ -26,23 +26,32 @@ public class TimeManager {
     private HashMap<String, Long> maxTimes = new HashMap<String, Long>();
     private HashMap<String, Long> minTimes = new HashMap<String, Long>();
     private HashMap<String, Long> EventStartTime = new HashMap<String, Long>();
+    private HashMap<String, Long> eventCount = new HashMap<String, Long>();
 
-    public void EventHasStarted(Event event, long thisTime) {
-        this.EventHasStarted(event.getClass().getCanonicalName(), thisTime);
+    public void EventHasStarted(Event event) {
+        this.EventHasStarted(event.getClass().getCanonicalName());
     }
 
-    public void EventHasEnded(Event event, long thisTime) {
-        this.EventHasEnded(event.getClass().getCanonicalName(), thisTime);
+    public void EventHasEnded(Event event) {
+        this.EventHasEnded(event.getClass().getCanonicalName());
     }
 
-    public void EventHasStarted(String name, long thisTime) {
-        this.EventStartTime.put(name, thisTime);
+    public void EventHasStarted(String name) {
+        this.EventStartTime.put(name, System.nanoTime());
     }
 
-    public void EventHasEnded(String name, long thisTime) {
-        long difference = thisTime - EventStartTime.get(name);
+    public void EventHasEnded(String name) {        
+        long thisTime = System.nanoTime();
+        long difference = thisTime - this.EventStartTime.get(name);
         this.updateMaxTime(name, difference);
-        this.updateMinTime(name, difference);
+        this.updateMinTime(name, difference);        
+        // UPDATE EVENTCOUNT
+        long currentCount = 0;
+        if (this.eventCount.get(name) != null) {
+            currentCount = this.eventCount.get(name);
+        }
+        currentCount++;
+        this.eventCount.put(name, currentCount);
     }
 
     private void updateMaxTime(String name, long thisTime) {
