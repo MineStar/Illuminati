@@ -76,13 +76,13 @@ public class TimeManager {
         this.updateMinTime(event.getClass().getCanonicalName(), thisTime);
     }
 
-    private long getMaxTime(String name) {
+    public long getMaxTime(String name) {
         if (!maxTimes.containsKey(name))
             setMaxTime(name, Long.MIN_VALUE);
         return maxTimes.get(name);
     }
 
-    private long getMinTime(String name) {
+    public long getMinTime(String name) {
         if (!minTimes.containsKey(name))
             setMinTime(name, Long.MAX_VALUE);
         return minTimes.get(name);

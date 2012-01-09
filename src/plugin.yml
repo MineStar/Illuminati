@@ -2,3 +2,7 @@ name: Illuminati
 main: de.minestar.illuminati.Illuminati
 version: 0.1
 depend: [GroupManager]
+commands:
+  iltime:
+    description: Show time of Event
+    usage: /iltime eventName
