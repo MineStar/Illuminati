@@ -78,13 +78,13 @@ public class TimeManager {
 
     private long getMaxTime(String name) {
         if (!maxTimes.containsKey(name))
-            setMaxTime(name, System.currentTimeMillis());
+            setMaxTime(name, System.nanoTime());
         return maxTimes.get(name);
     }
 
     private long getMinTime(String name) {
         if (!minTimes.containsKey(name))
-            setMinTime(name, System.currentTimeMillis());
+            setMinTime(name, System.nanoTime());
         return minTimes.get(name);
     }
 
