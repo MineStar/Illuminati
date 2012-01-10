@@ -18,15 +18,18 @@
 
 package de.minestar.illuminati.manager;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.event.Event;
 
 public class TimeManager {
-    private HashMap<String, Long> maxTimes = new HashMap<String, Long>();
-    private HashMap<String, Long> minTimes = new HashMap<String, Long>();
-    private HashMap<String, Long> EventStartTime = new HashMap<String, Long>();
-    private HashMap<String, Long> eventCount = new HashMap<String, Long>();
+    private ConcurrentHashMap<String, Long> maxTimes = new ConcurrentHashMap<String, Long>();
+    private ConcurrentHashMap<String, Long> minTimes = new ConcurrentHashMap<String, Long>();
+    private ConcurrentHashMap<String, Long> EventStartTime = new ConcurrentHashMap<String, Long>();
+    private ConcurrentHashMap<String, Long> eventCount = new ConcurrentHashMap<String, Long>();
+    private ConcurrentHashMap<String, Long> totalTimes = new ConcurrentHashMap<String, Long>();
 
     public void EventHasStarted(Event event) {
         this.EventHasStarted(event.getClass().getCanonicalName());
@@ -40,11 +43,22 @@ public class TimeManager {
         this.EventStartTime.put(name, System.nanoTime());
     }
 
-    public void EventHasEnded(String name) {        
+    public ArrayList<String> getEventNames(String partial) {
+        partial = partial.toLowerCase();
+        ArrayList<String> eventList = new ArrayList<String>();
+        for (Map.Entry<String, Long> entry : this.maxTimes.entrySet()) {
+            if (entry.getKey().toLowerCase().contains(partial)) {
+                eventList.add(entry.getKey());
+            }
+        }
+        return eventList;
+    }
+
+    public void EventHasEnded(String name) {
         long thisTime = System.nanoTime();
         long difference = thisTime - this.EventStartTime.get(name);
         this.updateMaxTime(name, difference);
-        this.updateMinTime(name, difference);        
+        this.updateMinTime(name, difference);
         // UPDATE EVENTCOUNT
         long currentCount = 0;
         if (this.eventCount.get(name) != null) {
@@ -52,6 +66,24 @@ public class TimeManager {
         }
         currentCount++;
         this.eventCount.put(name, currentCount);
+        this.updateTotalTimes(name, difference);
+    }
+
+    private void updateTotalTimes(String name, long thisTime) {
+        long oldTime = 0;
+        if (this.totalTimes.containsKey(name)) {
+            oldTime = this.totalTimes.get(name);
+        }
+        oldTime += thisTime;
+        this.totalTimes.put(name, oldTime);
+    }
+
+    public long getAverageTime(String name) {
+        if (!this.eventCount.containsKey(name)) {
+            return 0l;
+        }
+        long totalTime = this.totalTimes.get(name);
+        return (totalTime / this.getEventCount(name));
     }
 
     private void updateMaxTime(String name, long thisTime) {
@@ -74,6 +106,12 @@ public class TimeManager {
 
     public void updateMinTime(Event event, long thisTime) {
         this.updateMinTime(event.getClass().getCanonicalName(), thisTime);
+    }
+
+    public long getEventCount(String name) {
+        if (!maxTimes.containsKey(name))
+            return 0;
+        return eventCount.get(name);
     }
 
     public long getMaxTime(String name) {

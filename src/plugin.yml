@@ -1,8 +1,8 @@
 name: Illuminati
 main: de.minestar.illuminati.Illuminati
 version: 0.1
-depend: [GroupManager]
+depend: [GroupManager, FalseBookCore]
 commands:
-  iltime:
-    description: Show time of Event
-    usage: /iltime eventName
+  illu:
+    description: Illuminati related events
+    usage: /illu
