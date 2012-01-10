@@ -31,28 +31,14 @@ public class TimeManager {
     private HashMap<String, Long> totalTimes = new HashMap<String, Long>();
 
     public void EventHasStarted(Event event) {
-        this.EventHasStarted(event.getClass().getCanonicalName());
+        this.EventHasStarted(event.getEventName());
     }
 
     public void EventHasEnded(Event event) {
-        this.EventHasEnded(event.getClass().getCanonicalName());
-    }
-
-    private String clearName(String name) {
-        name = name.replace("org.bukkit.event.", "");
-        name = name.replace("block.", "");
-        name = name.replace("entity.", "");
-        name = name.replace("inventory.", "");
-        name = name.replace("player.", "");
-        name = name.replace("vehicle.", "");
-        name = name.replace("server.", "");
-        name = name.replace("weather.", "");
-        name = name.replace("world.", "");
-        return name;
+        this.EventHasEnded(event.getEventName());
     }
 
     public void EventHasStarted(String name) {
-        name = this.clearName(name);
         this.EventStartTime.put(name, System.nanoTime());
     }
 
@@ -68,7 +54,6 @@ public class TimeManager {
     }
 
     public void EventHasEnded(String name) {
-        name = this.clearName(name);
         long thisTime = System.nanoTime();
         long difference = thisTime - this.EventStartTime.get(name);
         this.updateMaxTime(name, difference);
