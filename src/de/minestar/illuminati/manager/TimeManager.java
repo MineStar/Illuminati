@@ -19,17 +19,16 @@
 package de.minestar.illuminati.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.bukkit.event.Event;
 
 public class TimeManager {
-    private ConcurrentHashMap<String, Long> maxTimes = new ConcurrentHashMap<String, Long>();
-    private ConcurrentHashMap<String, Long> minTimes = new ConcurrentHashMap<String, Long>();
-    private ConcurrentHashMap<String, Long> EventStartTime = new ConcurrentHashMap<String, Long>();
-    private ConcurrentHashMap<String, Long> eventCount = new ConcurrentHashMap<String, Long>();
-    private ConcurrentHashMap<String, Long> totalTimes = new ConcurrentHashMap<String, Long>();
+    private HashMap<String, Long> maxTimes = new HashMap<String, Long>();
+    private HashMap<String, Long> minTimes = new HashMap<String, Long>();
+    private HashMap<String, Long> EventStartTime = new HashMap<String, Long>();
+    private HashMap<String, Long> eventCount = new HashMap<String, Long>();
+    private HashMap<String, Long> totalTimes = new HashMap<String, Long>();
 
     public void EventHasStarted(Event event) {
         this.EventHasStarted(event.getClass().getCanonicalName());
