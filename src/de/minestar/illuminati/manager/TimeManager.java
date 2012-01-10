@@ -47,7 +47,7 @@ public class TimeManager {
         partial = partial.toLowerCase();
         ArrayList<String> eventList = new ArrayList<String>();
         for (Map.Entry<String, Long> entry : this.maxTimes.entrySet()) {
-            if (entry.getKey().toLowerCase().contains(partial)) {
+            if (entry.getKey().toLowerCase().contains(partial) || partial.equalsIgnoreCase("all")) {
                 eventList.add(entry.getKey());
             }
         }

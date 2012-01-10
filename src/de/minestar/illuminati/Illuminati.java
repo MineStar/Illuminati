@@ -20,6 +20,10 @@
 package de.minestar.illuminati;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -70,14 +74,37 @@ public class Illuminati extends JavaPlugin {
     private PlayerManager pManager;
     private CommandList commandList;
 
-    private static TimeManager timeManager; 
+    private static TimeManager timeManager;
     private static TickManager tickManager;
     @Override
     public void onDisable() {
         dbHandler.closeConnection();
         dbHandler = null;
         pManager = null;
+        this.saveStatistics();
         ChatUtils.printConsoleInfo("Disabled!");
+    }
+
+    private void saveStatistics() {
+        try {
+            SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd_HH-mm_ss");
+            String dateiName = "plugins/Illuminati/" + dateformat.format(new Date()) + ".csv";
+
+            FileOutputStream schreibeStrom = new FileOutputStream(dateiName);
+            String headline = "Eventname;EventCount;MinTime;MaxTime;Average Time;";
+            schreibeStrom.write(headline.getBytes());
+            schreibeStrom.write(System.getProperty("line.separator").getBytes());
+
+            ArrayList<String> eventList = Illuminati.getTimeManager().getEventNames("all");
+            for (String event : eventList) {
+                String text = event.replace("org.bukkit.event.", "") + ";" + Illuminati.getTimeManager().getEventCount(event) + ";" + Illuminati.getTimeManager().getMinTime(event) + ";" + Illuminati.getTimeManager().getMaxTime(event) + ";" + Illuminati.getTimeManager().getAverageTime(event) + ";";
+                schreibeStrom.write(text.getBytes());
+                schreibeStrom.write(System.getProperty("line.separator").getBytes());
+            }
+            schreibeStrom.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -117,7 +144,7 @@ public class Illuminati extends JavaPlugin {
     public static TimeManager getTimeManager() {
         return timeManager;
     }
-    
+
     public static TickManager getTickManager() {
         return tickManager;
     }

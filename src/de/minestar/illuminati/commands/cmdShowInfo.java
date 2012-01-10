@@ -41,19 +41,18 @@ public class cmdShowInfo extends ExtendedCommand {
         double factor = 1;
         String unit = "ns";
         DecimalFormat formater = new DecimalFormat("#.###");
-        if(args.length >= 2) {
-            if(args[1].equalsIgnoreCase("ms")) {
+        if (args.length >= 2) {
+            if (args[1].equalsIgnoreCase("ms")) {
                 factor = 1000000;
                 unit = "ms";
             }
         }
-        
+
         ChatUtils.printInfo(player, pluginName, ChatColor.YELLOW, "List of Events:");
         ChatUtils.printInfo(player, pluginName, ChatColor.GREEN, "EventName : Eventcount - MinTime / MaxTime / Average");
         ArrayList<String> eventList = Illuminati.getTimeManager().getEventNames(args[0]);
-
         for (String event : eventList) {
-            ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, event.replace("org.bukkit.event.", "") + " : " + Illuminati.getTimeManager().getEventCount(event) + " - "+ formater.format(((double)Illuminati.getTimeManager().getMinTime(event)/factor)) + unit + " / " + formater.format(((double)Illuminati.getTimeManager().getMaxTime(event)/factor)) + unit + " / " + formater.format(((double)Illuminati.getTimeManager().getAverageTime(event)/factor)) + unit);
+            ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, event.replace("org.bukkit.event.", "") + " : " + Illuminati.getTimeManager().getEventCount(event) + " - " + formater.format(((double) Illuminati.getTimeManager().getMinTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getMaxTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getAverageTime(event) / factor)) + unit);
         }
     }
 }
