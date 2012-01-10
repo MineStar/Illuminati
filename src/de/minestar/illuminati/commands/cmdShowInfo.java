@@ -52,7 +52,7 @@ public class cmdShowInfo extends ExtendedCommand {
         ChatUtils.printInfo(player, pluginName, ChatColor.GREEN, "EventName : Eventcount - MinTime / MaxTime / Average");
         ArrayList<String> eventList = Illuminati.getTimeManager().getEventNames(args[0]);
         for (String event : eventList) {
-            ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, event.replace("org.bukkit.event.", "") + " : " + Illuminati.getTimeManager().getEventCount(event) + " - " + formater.format(((double) Illuminati.getTimeManager().getMinTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getMaxTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getAverageTime(event) / factor)) + unit);
+            ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, event + " : " + Illuminati.getTimeManager().getEventCount(event) + " - " + formater.format(((double) Illuminati.getTimeManager().getMinTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getMaxTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getAverageTime(event) / factor)) + unit);
         }
     }
 }
