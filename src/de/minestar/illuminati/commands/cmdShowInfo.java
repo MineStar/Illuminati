@@ -19,14 +19,15 @@
 package de.minestar.illuminati.commands;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.Map;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.MyEventStatistic;
+import org.bukkit.plugin.SimplePluginManager;
+
 import com.bukkit.gemo.commands.ExtendedCommand;
 import com.bukkit.gemo.utils.ChatUtils;
-
-import de.minestar.illuminati.Illuminati;
 
 public class cmdShowInfo extends ExtendedCommand {
 
@@ -50,9 +51,12 @@ public class cmdShowInfo extends ExtendedCommand {
 
         ChatUtils.printInfo(player, pluginName, ChatColor.YELLOW, "List of Events:");
         ChatUtils.printInfo(player, pluginName, ChatColor.GREEN, "EventName : Eventcount - MinTime / MaxTime / Average");
-        ArrayList<String> eventList = Illuminati.getTimeManager().getEventNames(args[0]);
-        for (String event : eventList) {
-            ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, event + " : " + Illuminati.getTimeManager().getEventCount(event) + " - " + formater.format(((double) Illuminati.getTimeManager().getMinTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getMaxTime(event) / factor)) + unit + " / " + formater.format(((double) Illuminati.getTimeManager().getAverageTime(event) / factor)) + unit);
+        MyEventStatistic stat = null;
+        for (Map.Entry<String, MyEventStatistic> entry : SimplePluginManager.statisticMap.entrySet()) {
+            if (entry.getKey().toLowerCase().contains(args[0].toLowerCase())) {
+                stat = entry.getValue();
+                ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, entry.getKey() + " : " + stat.eventCount + " - " + formater.format(((double) stat.minTime / factor)) + unit + " / " + formater.format(((double) stat.maxTime / factor)) + unit + " / " + formater.format(((double) (stat.allTime / stat.eventCount) / factor)) + unit);
+            }
         }
     }
 }

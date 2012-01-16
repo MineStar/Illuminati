@@ -47,7 +47,6 @@ public class PListener extends PlayerListener {
 
     @Override
     public void onPlayerJoin(PlayerJoinEvent event) {
-
         pManager.handleLogin(event.getPlayer());
     }
 

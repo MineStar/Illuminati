@@ -128,10 +128,10 @@ public class DatabaseHandler {
         return -1;
     }
 
-    public boolean addLogout(Player player, int id) {
+    public boolean addLogout(String player, int id) {
         Group g = null;
         try {
-            g = Group.getGroup(UtilPermissions.getGroupName(player));
+            g = Group.getGroup(UtilPermissions.getGroupName(player, "world"));
             addLogout.setInt(1, g.ordinal());
             addLogout.setInt(2, id);
             return addLogout.executeUpdate() == 1;

@@ -35,7 +35,9 @@ public class ServerCommandListener extends ServerListener {
     public void onServerCommand(ServerCommandEvent event) {
         if (event.getCommand().equalsIgnoreCase("stop"))
             pManager.logoutAll(event.getSender().getServer());
-        else if (event.getCommand().equalsIgnoreCase("reload"))
+        else if (event.getCommand().equalsIgnoreCase("reload")) {
             pManager.writeLogins();
+        }
+
     }
 }

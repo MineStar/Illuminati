@@ -26,9 +26,11 @@ import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
+import de.minestar.illuminati.Illuminati;
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.utils.ChatUtils;
 
@@ -36,7 +38,7 @@ public class PlayerManager {
 
     // Store autogenerate key from login table update to store logout time/
     // group in same entry
-    private HashMap<String, Integer> tableIDs;
+    private static HashMap<String, Integer> tableIDs;
 
     private DatabaseHandler dbHandler;
 
@@ -49,21 +51,11 @@ public class PlayerManager {
     }
 
     public void handleLogin(Player p) {
-
-        int id = dbHandler.addLogin(p);
-        if (id == -1)
-            ChatUtils.printConsoleError("Can't add login information for User '" + p.getName() + "'!");
-        else
-            tableIDs.put(p.getName(), Integer.valueOf(id));
+        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Illuminati.getInstance(), new PlayerEvent(true, p, dbHandler));
     }
 
     public void handleLogout(Player p) {
-
-        Integer id = tableIDs.remove(p.getName());
-        if (id == null)
-            return;
-        if (!dbHandler.addLogout(p, id))
-            ChatUtils.printConsoleError("Can't add logout information for User '" + p.getName() + "'!");
+        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Illuminati.getInstance(), new PlayerEvent(false, p, dbHandler));
     }
 
     /**
@@ -74,9 +66,8 @@ public class PlayerManager {
      * @param s
      */
     public void logoutAll(Server s) {
-
         for (Entry<String, Integer> entry : tableIDs.entrySet()) {
-            if (!dbHandler.addLogout(s.getPlayerExact(entry.getKey()), entry.getValue()))
+            if (!dbHandler.addLogout(s.getPlayerExact(entry.getKey()).getName(), entry.getValue()))
                 ChatUtils.printConsoleError("Can't add logout information for User=" + entry.getKey() + " and ID=" + entry.getValue() + "!");
         }
     }
@@ -135,5 +126,18 @@ public class PlayerManager {
         } catch (Exception e) {
             ChatUtils.printConsoleException(e, "Can't load temponary login infos!");
         }
+    }
+
+    public static void setID(Player player, int ID) {
+        tableIDs.put(player.getName(), Integer.valueOf(ID));
+    }
+
+    public static int removeID(String player) {
+        int ID = -1;
+        if (tableIDs.containsKey(player)) {
+            ID = tableIDs.get(player);
+            tableIDs.remove(player);
+        }
+        return ID;
     }
 }
