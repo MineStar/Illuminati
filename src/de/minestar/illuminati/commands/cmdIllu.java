@@ -19,7 +19,7 @@
 package de.minestar.illuminati.commands;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import com.bukkit.gemo.commands.Command;
 import com.bukkit.gemo.commands.SuperCommand;
@@ -32,16 +32,16 @@ public class cmdIllu extends SuperCommand {
     }
 
     @Override
-    public void execute(String[] args, Player player) {
-        ChatUtils.printLine(player, ChatColor.AQUA, "-------------- [ Illuminati Help ] --------------");
+    public void execute(String[] args, CommandSender sender) {
+        ChatUtils.printLine(sender, ChatColor.AQUA, "-------------- [ Illuminati Help ] --------------");
         Command[] commands = getSubCommands();
         for (Command command : commands)
-            ChatUtils.printLine(player, ChatColor.GRAY, command.getHelpMessage());
+            ChatUtils.printLine(sender, ChatColor.GRAY, command.getHelpMessage());
     }
 
     @Override
-    public void run(String[] args, Player player) {
-        if (!runSubCommand(args, player))
-            super.run(args, player);
+    public void run(String[] args, CommandSender sender) {
+        if (!runSubCommand(args, sender))
+            super.run(args, sender);
     }
 }

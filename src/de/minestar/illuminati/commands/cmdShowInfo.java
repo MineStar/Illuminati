@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.MyEventStatistic;
 import org.bukkit.plugin.SimplePluginManager;
 
@@ -37,7 +37,7 @@ public class cmdShowInfo extends ExtendedCommand {
     }
 
     @Override
-    public void execute(String[] args, Player player) {
+    public void execute(String[] args, CommandSender sender) {
         // GET EVENTNAME
         double factor = 1;
         String unit = "ns";
@@ -49,13 +49,13 @@ public class cmdShowInfo extends ExtendedCommand {
             }
         }
 
-        ChatUtils.printInfo(player, pluginName, ChatColor.YELLOW, "List of Events:");
-        ChatUtils.printInfo(player, pluginName, ChatColor.GREEN, "EventName : Eventcount - MinTime / MaxTime / Average");
+        ChatUtils.printInfo(sender, pluginName, ChatColor.YELLOW, "List of Events:");
+        ChatUtils.printInfo(sender, pluginName, ChatColor.GREEN, "EventName : Eventcount - MinTime / MaxTime / Average");
         MyEventStatistic stat = null;
         for (Map.Entry<String, MyEventStatistic> entry : SimplePluginManager.statisticMap.entrySet()) {
             if (entry.getKey().toLowerCase().contains(args[0].toLowerCase())) {
                 stat = entry.getValue();
-                ChatUtils.printInfo(player, pluginName, ChatColor.GRAY, entry.getKey() + " : " + stat.eventCount + " - " + formater.format(((double) stat.minTime / factor)) + unit + " / " + formater.format(((double) stat.maxTime / factor)) + unit + " / " + formater.format(((double) (stat.allTime / stat.eventCount) / factor)) + unit);
+                ChatUtils.printInfo(sender, pluginName, ChatColor.GRAY, entry.getKey() + " : " + stat.eventCount + " - " + formater.format(((double) stat.minTime / factor)) + unit + " / " + formater.format(((double) stat.maxTime / factor)) + unit + " / " + formater.format(((double) (stat.allTime / stat.eventCount) / factor)) + unit);
             }
         }
     }
