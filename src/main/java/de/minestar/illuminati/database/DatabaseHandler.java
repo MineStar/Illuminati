@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 import com.bukkit.gemo.utils.UtilPermissions;
 
 import de.minestar.illuminati.data.Group;
-import de.minestar.illuminati.utils.ChatUtils;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class DatabaseHandler {
 
@@ -45,7 +45,7 @@ public class DatabaseHandler {
         try {
             init(dataFolder);
         } catch (Exception e) {
-            ChatUtils.printConsoleException(e, "Can't create a database connection!");
+            ConsoleUtils.printException(e, "Illuminati", "Can't create a database connection!");
         }
     }
 
@@ -61,7 +61,7 @@ public class DatabaseHandler {
 
         if (!configFile.exists()) {
             configFile.createNewFile();
-            ChatUtils.printConsoleError("Can't find SQL Configuration in " + configFile.toString() + "! Creating a default one! Please restart server after configured SQL connection!");
+            ConsoleUtils.printError("Illuminati", "Can't find SQL Configuration in " + configFile.toString() + "! Creating a default one! Please restart server after configured SQL connection!");
             config.load(configFile);
             config.set("host", "");
             config.set("port", "");
@@ -77,7 +77,7 @@ public class DatabaseHandler {
 
         for (String info : conInfos)
             if (info == null || info.isEmpty()) {
-                ChatUtils.printConsoleError("SQL configuration is incomplete! Please complete connection information in " + configFile.toString() + " and restart server!");
+                ConsoleUtils.printError("Illuminati", "SQL configuration is incomplete! Please complete connection information in " + configFile.toString() + " and restart server!");
             }
 
         dbConnection = new DatabaseConnection(conInfos[0], conInfos[1], conInfos[2], conInfos[3], conInfos[4]);
@@ -123,7 +123,7 @@ public class DatabaseHandler {
                 return -1;
             return rs.getInt(1);
         } catch (Exception e) {
-            ChatUtils.printConsoleException(e, "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, "Illuminati", "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
         }
         return -1;
     }
@@ -136,7 +136,7 @@ public class DatabaseHandler {
             addLogout.setInt(2, id);
             return addLogout.executeUpdate() == 1;
         } catch (Exception e) {
-            ChatUtils.printConsoleException(e, "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, "Illuminati", "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
         }
         return false;
     }

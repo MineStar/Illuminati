@@ -32,7 +32,7 @@ import org.bukkit.entity.Player;
 
 import de.minestar.illuminati.Illuminati;
 import de.minestar.illuminati.database.DatabaseHandler;
-import de.minestar.illuminati.utils.ChatUtils;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class PlayerManager {
 
@@ -68,7 +68,7 @@ public class PlayerManager {
     public void logoutAll(Server s) {
         for (Entry<String, Integer> entry : tableIDs.entrySet()) {
             if (!dbHandler.addLogout(s.getPlayerExact(entry.getKey()).getName(), entry.getValue()))
-                ChatUtils.printConsoleError("Can't add logout information for User=" + entry.getKey() + " and ID=" + entry.getValue() + "!");
+                ConsoleUtils.printError("Illuminati", "Can't add logout information for User=" + entry.getKey() + " and ID=" + entry.getValue() + "!");
         }
     }
 
@@ -91,10 +91,9 @@ public class PlayerManager {
             }
             writer.close();
         } catch (Exception e) {
-            ChatUtils.printConsoleException(e, "Can't temponary save all logged in players!");
+            ConsoleUtils.printException(e, "Illuminati", "Can't temponary save all logged in players!");
         }
     }
-
     /**
      * When server is reloading all login information are lsot. This method
      * restore them from the temponary file created when the server is reloading
@@ -124,7 +123,7 @@ public class PlayerManager {
             if (!temp.delete())
                 temp.deleteOnExit();
         } catch (Exception e) {
-            ChatUtils.printConsoleException(e, "Can't load temponary login infos!");
+            ConsoleUtils.printException(e, "Illuminati", "Can't load temponary login infos!");
         }
     }
 

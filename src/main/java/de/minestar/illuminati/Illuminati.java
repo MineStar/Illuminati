@@ -29,7 +29,7 @@ import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.listener.PListener;
 import de.minestar.illuminati.listener.ServerCommandListener;
 import de.minestar.illuminati.manager.PlayerManager;
-import de.minestar.illuminati.utils.ChatUtils;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class Illuminati extends JavaPlugin {
 
@@ -42,7 +42,7 @@ public class Illuminati extends JavaPlugin {
         dbHandler.closeConnection();
         dbHandler = null;
         pManager = null;
-        ChatUtils.printConsoleInfo("Disabled!");
+        ConsoleUtils.printInfo("Illuminati", "Disabled!");
     }
 
     public void onEnable() {
@@ -61,7 +61,7 @@ public class Illuminati extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ServerCommandListener(pManager), this);
 
         // PRINT INFO
-        ChatUtils.printConsoleInfo("Version " + getDescription().getVersion() + " enabled!");
+        ConsoleUtils.printInfo("Illuminati", "Version " + getDescription().getVersion() + " enabled!");
     }
 
     public static Illuminati getInstance() {

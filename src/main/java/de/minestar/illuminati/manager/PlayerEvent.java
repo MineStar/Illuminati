@@ -21,7 +21,7 @@ package de.minestar.illuminati.manager;
 import org.bukkit.entity.Player;
 
 import de.minestar.illuminati.database.DatabaseHandler;
-import de.minestar.illuminati.utils.ChatUtils;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class PlayerEvent implements Runnable {
     private boolean isLogin = true;
@@ -40,7 +40,7 @@ public class PlayerEvent implements Runnable {
         if (this.isLogin) {
             int ID = dbHandler.addLogin(player);
             if (ID == -1)
-                ChatUtils.printConsoleError("Can't add login information for User '" + player.getName() + "'!");
+                ConsoleUtils.printError("Illuminati", "Can't add login information for User '" + player.getName() + "'!");
             else {
                 PlayerManager.setID(player, ID);
             }
@@ -51,7 +51,7 @@ public class PlayerEvent implements Runnable {
             if (ID == -1)
                 return;
             if (!dbHandler.addLogout(playerName, ID))
-                ChatUtils.printConsoleError("Can't add logout information for User '" + player.getName() + "'!");
+                ConsoleUtils.printError("Illuminati", "Can't add logout information for User '" + player.getName() + "'!");
         }
     }
 
