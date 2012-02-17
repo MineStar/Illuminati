@@ -18,12 +18,13 @@
 
 package de.minestar.illuminati.listener;
 
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerCommandEvent;
-import org.bukkit.event.server.ServerListener;
 
 import de.minestar.illuminati.manager.PlayerManager;
 
-public class ServerCommandListener extends ServerListener {
+public class ServerCommandListener implements Listener {
 
     private PlayerManager pManager;
 
@@ -31,7 +32,7 @@ public class ServerCommandListener extends ServerListener {
         this.pManager = pManager;
     }
 
-    @Override
+    @EventHandler
     public void onServerCommand(ServerCommandEvent event) {
         if (event.getCommand().equalsIgnoreCase("stop"))
             pManager.logoutAll(event.getSender().getServer());

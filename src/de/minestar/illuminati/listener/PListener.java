@@ -19,15 +19,16 @@
 package de.minestar.illuminati.listener;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import de.minestar.illuminati.manager.PlayerManager;
 
-public class PListener extends PlayerListener {
+public class PListener implements Listener {
 
     private PlayerManager pManager;
 
@@ -35,17 +36,17 @@ public class PListener extends PlayerListener {
         this.pManager = pManager;
     }
 
-    @Override
+    @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
         addLogout(event.getPlayer());
     }
 
-    @Override
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         addLogout(event.getPlayer());
     }
 
-    @Override
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         pManager.handleLogin(event.getPlayer());
     }
@@ -54,7 +55,7 @@ public class PListener extends PlayerListener {
         pManager.handleLogout(p);
     }
 
-    @Override
+    @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         if (event.getPlayer().isOp()) {
             if (event.getMessage().toLowerCase().startsWith("/stop"))
