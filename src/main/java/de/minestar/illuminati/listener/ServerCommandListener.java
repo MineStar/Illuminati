@@ -39,6 +39,5 @@ public class ServerCommandListener implements Listener {
         else if (event.getCommand().equalsIgnoreCase("reload")) {
             pManager.writeLogins();
         }
-
     }
 }

@@ -30,7 +30,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-import de.minestar.illuminati.Illuminati;
+import de.minestar.illuminati.Core;
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
@@ -51,11 +51,11 @@ public class PlayerManager {
     }
 
     public void handleLogin(Player p) {
-        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Illuminati.getInstance(), new PlayerEvent(true, p, dbHandler));
+        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Core.getInstance(), new PlayerEvent(true, p, dbHandler));
     }
 
     public void handleLogout(Player p) {
-        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Illuminati.getInstance(), new PlayerEvent(false, p, dbHandler));
+        Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(Core.getInstance(), new PlayerEvent(false, p, dbHandler));
     }
 
     /**
@@ -68,7 +68,7 @@ public class PlayerManager {
     public void logoutAll(Server s) {
         for (Entry<String, Integer> entry : tableIDs.entrySet()) {
             if (!dbHandler.addLogout(s.getPlayerExact(entry.getKey()).getName(), entry.getValue()))
-                ConsoleUtils.printError("Illuminati", "Can't add logout information for User=" + entry.getKey() + " and ID=" + entry.getValue() + "!");
+                ConsoleUtils.printError(Core.NAME, "Can't add logout information for User=" + entry.getKey() + " and ID=" + entry.getValue() + "!");
         }
     }
 
@@ -91,7 +91,7 @@ public class PlayerManager {
             }
             writer.close();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, "Illuminati", "Can't temponary save all logged in players!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't temponary save all logged in players!");
         }
     }
     /**
@@ -123,7 +123,7 @@ public class PlayerManager {
             if (!temp.delete())
                 temp.deleteOnExit();
         } catch (Exception e) {
-            ConsoleUtils.printException(e, "Illuminati", "Can't load temponary login infos!");
+            ConsoleUtils.printException(e, Core.NAME, "Can't load temponary login infos!");
         }
     }
 

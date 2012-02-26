@@ -29,86 +29,47 @@ import org.bukkit.entity.Player;
 
 import com.bukkit.gemo.utils.UtilPermissions;
 
+import de.minestar.illuminati.Core;
 import de.minestar.illuminati.data.Group;
+import de.minestar.minestarlibrary.database.AbstractDatabaseHandler;
+import de.minestar.minestarlibrary.database.DatabaseConnection;
+import de.minestar.minestarlibrary.database.DatabaseType;
+import de.minestar.minestarlibrary.database.DatabaseUtils;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class DatabaseHandler {
-
-    private DatabaseConnection dbConnection;
+public class DatabaseHandler extends AbstractDatabaseHandler {
 
     // Prepared Statements
     private PreparedStatement addLogin;
     private PreparedStatement addLogout;
     // /Prepared Statements
 
-    public DatabaseHandler(File dataFolder) {
-        try {
-            init(dataFolder);
-        } catch (Exception e) {
-            ConsoleUtils.printException(e, "Illuminati", "Can't create a database connection!");
-        }
+    public DatabaseHandler(String pluginName, File dataFolder) {
+        super(pluginName, dataFolder);
     }
 
-    private void init(File dataFolder) throws Exception {
-        createConnection(dataFolder);
-        checkStructure();
-        createStatements();
-    }
-
-    private void createConnection(File dataFolder) throws Exception {
-        YamlConfiguration config = new YamlConfiguration();
+    @Override
+    protected DatabaseConnection createConnection(String pluginName, File dataFolder) throws Exception {
         File configFile = new File(dataFolder, "sqlconfig.yml");
-
-        if (!configFile.exists()) {
-            configFile.createNewFile();
-            ConsoleUtils.printError("Illuminati", "Can't find SQL Configuration in " + configFile.toString() + "! Creating a default one! Please restart server after configured SQL connection!");
+        if (!configFile.exists())
+            DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, pluginName);
+        else {
+            YamlConfiguration config = new YamlConfiguration();
             config.load(configFile);
-            config.set("host", "");
-            config.set("port", "");
-            config.set("database", "");
-            config.set("user", "");
-            config.set("password", "");
-            config.save(configFile);
-            return;
+            return new DatabaseConnection(pluginName, DatabaseType.MySQL, config);
         }
-
-        config.load(configFile);
-        String[] conInfos = {config.getString("host"), Integer.toString(config.getInt("port")), config.getString("database"), config.getString("user"), config.getString("password")};
-
-        for (String info : conInfos)
-            if (info == null || info.isEmpty()) {
-                ConsoleUtils.printError("Illuminati", "SQL configuration is incomplete! Please complete connection information in " + configFile.toString() + " and restart server!");
-            }
-
-        dbConnection = new DatabaseConnection(conInfos[0], conInfos[1], conInfos[2], conInfos[3], conInfos[4]);
-        conInfos = null;
-        System.gc();
+        return null;
     }
 
-    private void checkStructure() throws Exception {
-        Connection con = dbConnection.getConnection();
-        // @formatter:off
-        con.createStatement().execute(
-                "CREATE  TABLE IF NOT EXISTS `stats` (" +
-                "  `id` INT NOT NULL AUTO_INCREMENT ," +
-                "  `player` VARCHAR(45) NOT NULL ," +
-                "  `loginGroup` INT NOT NULL ," +
-                "  `loginTime` DATETIME NOT NULL ," +
-                "  `logoutGroup` INT ," +
-                "  `logoutTime` DATETIME ," +
-                "  PRIMARY KEY (`id`) )" +
-                "ENGINE = InnoDB;");
-        // @formatter:on
+    @Override
+    protected void createStructure(String pluginName, Connection con) throws Exception {
+        DatabaseUtils.createStructure(getClass().getResourceAsStream("/structure.sql"), con, pluginName);
     }
 
-    private void createStatements() throws Exception {
-        Connection con = dbConnection.getConnection();
+    @Override
+    protected void createStatements(String pluginName, Connection con) throws Exception {
         addLogin = con.prepareStatement("INSERT INTO stats (player,loginGroup,loginTime) VALUES(?,?,NOW())", Statement.RETURN_GENERATED_KEYS);
         addLogout = con.prepareStatement("UPDATE stats SET logoutGroup = ? , logoutTime = NOW() WHERE id = ?");
-    }
-
-    public void closeConnection() {
-        dbConnection.closeConnection();
     }
 
     public int addLogin(Player player) {
@@ -123,7 +84,7 @@ public class DatabaseHandler {
                 return -1;
             return rs.getInt(1);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, "Illuminati", "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, Core.NAME, "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
         }
         return -1;
     }
@@ -136,7 +97,7 @@ public class DatabaseHandler {
             addLogout.setInt(2, id);
             return addLogout.executeUpdate() == 1;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, "Illuminati", "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, Core.NAME, "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
         }
         return false;
     }

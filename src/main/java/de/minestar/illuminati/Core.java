@@ -31,18 +31,20 @@ import de.minestar.illuminati.listener.ServerCommandListener;
 import de.minestar.illuminati.manager.PlayerManager;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class Illuminati extends JavaPlugin {
+public class Core extends JavaPlugin {
+
+    public final static String NAME = "Illuminati";
 
     private DatabaseHandler dbHandler;
     private PlayerManager pManager;
 
-    private static Illuminati instance;
+    private static Core instance;
 
     public void onDisable() {
         dbHandler.closeConnection();
         dbHandler = null;
         pManager = null;
-        ConsoleUtils.printInfo("Illuminati", "Disabled!");
+        ConsoleUtils.printInfo(NAME, "Disabled!");
     }
 
     public void onEnable() {
@@ -52,7 +54,7 @@ public class Illuminati extends JavaPlugin {
         dataFolder.mkdirs();
 
         // REGISTER MANAGERS
-        dbHandler = new DatabaseHandler(dataFolder);
+        dbHandler = new DatabaseHandler(NAME, dataFolder);
         pManager = new PlayerManager(dbHandler, dataFolder);
 
         // REGISTER EVENTS
@@ -61,10 +63,10 @@ public class Illuminati extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ServerCommandListener(pManager), this);
 
         // PRINT INFO
-        ConsoleUtils.printInfo("Illuminati", "Version " + getDescription().getVersion() + " enabled!");
+        ConsoleUtils.printInfo(NAME, "Version " + getDescription().getVersion() + " enabled!");
     }
 
-    public static Illuminati getInstance() {
+    public static Core getInstance() {
         return instance;
     }
 }
