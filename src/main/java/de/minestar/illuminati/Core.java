@@ -21,8 +21,7 @@ package de.minestar.illuminati;
 
 import java.io.File;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.minestar.illuminati.database.DatabaseHandler;
@@ -58,9 +57,9 @@ public class Core extends JavaPlugin {
         pManager = new PlayerManager(dbHandler, dataFolder);
 
         // REGISTER EVENTS
-        Listener pListener = new PListener(pManager);
-        Bukkit.getPluginManager().registerEvents(pListener, this);
-        Bukkit.getPluginManager().registerEvents(new ServerCommandListener(pManager), this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new PListener(pManager), this);
+        pm.registerEvents(new ServerCommandListener(pManager), this);
 
         // PRINT INFO
         ConsoleUtils.printInfo(NAME, "Version " + getDescription().getVersion() + " enabled!");
