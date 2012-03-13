@@ -1,5 +1,5 @@
 name: Illuminati
-main: de.minestar.illuminati.Illuminati
+main: de.minestar.illuminati.Core
 version: 0.1
 depend: [GroupManager, FalseBookCore]
 commands:
