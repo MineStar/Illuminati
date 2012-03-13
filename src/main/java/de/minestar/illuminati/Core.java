@@ -22,47 +22,53 @@ package de.minestar.illuminati;
 import java.io.File;
 
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.listener.PListener;
 import de.minestar.illuminati.listener.ServerCommandListener;
 import de.minestar.illuminati.manager.PlayerManager;
-import de.minestar.minestarlibrary.utils.ConsoleUtils;
+import de.minestar.minestarlibrary.AbstractCore;
 
-public class Core extends JavaPlugin {
-
-    public final static String NAME = "Illuminati";
+public class Core extends AbstractCore {
 
     private DatabaseHandler dbHandler;
     private PlayerManager pManager;
 
     private static Core instance;
 
-    public void onDisable() {
-        dbHandler.closeConnection();
-        dbHandler = null;
-        pManager = null;
-        ConsoleUtils.printInfo(NAME, "Disabled!");
+    public Core() {
+        super("Illuminati");
     }
 
-    public void onEnable() {
-        instance = this;
-
+    @Override
+    protected boolean createManager() {
         File dataFolder = getDataFolder();
         dataFolder.mkdirs();
 
-        // REGISTER MANAGERS
         dbHandler = new DatabaseHandler(NAME, dataFolder);
         pManager = new PlayerManager(dbHandler, dataFolder);
+        return true;
+    }
 
-        // REGISTER EVENTS
-        PluginManager pm = getServer().getPluginManager();
+    @Override
+    protected boolean registerEvents(PluginManager pm) {
         pm.registerEvents(new PListener(pManager), this);
         pm.registerEvents(new ServerCommandListener(pManager), this);
+        return true;
+    }
 
-        // PRINT INFO
-        ConsoleUtils.printInfo(NAME, "Version " + getDescription().getVersion() + " enabled!");
+    @Override
+    protected boolean commonEnable() {
+        instance = this;
+        return true;
+    }
+
+    @Override
+    protected boolean commonDisable() {
+        dbHandler.closeConnection();
+        dbHandler = null;
+        pManager = null;
+        return true;
     }
 
     public static Core getInstance() {
