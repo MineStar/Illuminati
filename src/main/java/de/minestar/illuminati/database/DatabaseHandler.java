@@ -20,32 +20,31 @@ package de.minestar.illuminati.database;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-
-import com.bukkit.gemo.utils.UtilPermissions;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import de.minestar.illuminati.Core;
-import de.minestar.illuminati.data.Group;
+import de.minestar.minestarlibrary.config.MinestarConfig;
 import de.minestar.minestarlibrary.database.AbstractDatabaseHandler;
 import de.minestar.minestarlibrary.database.DatabaseConnection;
 import de.minestar.minestarlibrary.database.DatabaseType;
 import de.minestar.minestarlibrary.database.DatabaseUtils;
+import de.minestar.minestarlibrary.stats.Statistic;
+import de.minestar.minestarlibrary.stats.StatisticType;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class DatabaseHandler extends AbstractDatabaseHandler {
 
-    // Prepared Statements
-    private PreparedStatement addLogin;
-    private PreparedStatement addLogout;
-    // /Prepared Statements
+    private Set<String> tables = new HashSet<String>();
+    private Map<Class<? extends Statistic>, String> insertHeads = new HashMap<Class<? extends Statistic>, String>();
 
     public DatabaseHandler(String pluginName, File dataFolder) {
         super(pluginName, dataFolder);
+        this.loadTableNames();
     }
 
     @Override
@@ -53,52 +52,110 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         File configFile = new File(dataFolder, "sqlconfig.yml");
         if (!configFile.exists())
             DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, pluginName);
-        else {
-            YamlConfiguration config = new YamlConfiguration();
-            config.load(configFile);
-            return new DatabaseConnection(pluginName, DatabaseType.MySQL, config);
-        }
+        else
+            return new DatabaseConnection(pluginName, DatabaseType.MySQL, new MinestarConfig(configFile));
+
         return null;
     }
 
     @Override
     protected void createStructure(String pluginName, Connection con) throws Exception {
-        DatabaseUtils.createStructure(getClass().getResourceAsStream("/structure.sql"), con, pluginName);
+        // WE NEED TO CREATE THE STRUCTURE AFTER ALL PLUGINS LOADED
+        // THEN WE KNOW WHICH TABLES WE HAVE TO CREATE
     }
 
     @Override
     protected void createStatements(String pluginName, Connection con) throws Exception {
-        addLogin = con.prepareStatement("INSERT INTO stats (player,loginGroup,loginTime) VALUES(?,?,NOW())", Statement.RETURN_GENERATED_KEYS);
-        addLogout = con.prepareStatement("UPDATE stats SET logoutGroup = ? , logoutTime = NOW() WHERE id = ?");
+        // WE HAVE TO GENERATE THE STATMENTS DYNAMICY
     }
 
-    public int addLogin(Player player) {
-        Group g = null;
+    // LOAD ALL TABLE NAMES FROM THE DATABASE. USED FOR isStatTableExisting
+    private void loadTableNames() {
         try {
-            g = Group.getGroup(UtilPermissions.getGroupName(player));
-            addLogin.setString(1, player.getName());
-            addLogin.setInt(2, g.ordinal());
-            addLogin.executeUpdate();
-            ResultSet rs = addLogin.getGeneratedKeys();
-            if (!rs.next())
-                return -1;
-            return rs.getInt(1);
+            // GET ALL TABLES
+            ResultSet rs = dbConnection.getConnection().createStatement().executeQuery("SHOW TABLES");
+            while (rs.next())
+                tables.add(rs.getString(1));
+            if (tables.isEmpty())
+                tables = null;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't add a login entry! PlayerName=" + player.getName() + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, Core.NAME, "Can't load table names from database!");
         }
-        return -1;
     }
 
-    public boolean addLogout(String player, int id) {
-        Group g = null;
+    // ****************************************
+    // ******** REGISTERING STATISTICS ********
+    // ****************************************
+
+    // REGISTER THE STATISTICS
+    public void registerStatistic(Statistic statistic) {
+        // DO WE HAVE TO CREATE A TABLE FOR IT?
+        if (!isStatTableExisting(statistic))
+            createStatTable(statistic);
+        // CREATEA A HEAD FOR THE INSERT QUERY
+        createQueryHead(statistic);
+    }
+
+    // CHECK IF THERE IS A TABLE FOR THE STATISTIC
+    public boolean isStatTableExisting(Statistic statistic) {
+        return tables != null && tables.contains(getTableName(statistic));
+    }
+
+    // GENERATE A TABLE WHICH STORES THE STATISTICS DATA
+    public void createStatTable(Statistic statistic) {
         try {
-            g = Group.getGroup(UtilPermissions.getGroupName(player, "world"));
-            addLogout.setInt(1, g.ordinal());
-            addLogout.setInt(2, id);
-            return addLogout.executeUpdate() == 1;
+
+            String tableName = getTableName(statistic);
+
+            // START BUILDING SQL QUERY
+            StringBuilder sBuilder = new StringBuilder("CREATE TABLE `");
+            sBuilder.append(tableName);
+            // ALWAYS HAVE AN ID
+            sBuilder.append("` ( `id` INT NOT NULL AUTO_INCREMENT , ");
+            // ITERATE THROUGH THE ATTRIBUTES
+            for (Entry<String, StatisticType> entry : statistic.getHead()) {
+                sBuilder.append('`');
+                sBuilder.append(entry.getKey());
+                sBuilder.append("` ");
+                sBuilder.append(entry.getValue().getName());
+                sBuilder.append(" , ");
+            }
+            sBuilder.append("PRIMARY KEY (`id`) ) ENGINE = InnoDB;");
+
+            // EXECUTE THE QUERY
+            dbConnection.getConnection().createStatement().execute(sBuilder.toString());
+            ConsoleUtils.printInfo(Core.NAME, "Statistic '" + statistic.getName() + "' from '" + statistic.getPluginName() + "' firstly registered!");
+
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't update logout entry! ID=" + id + ", Group=" + g.getName() + ", GroupID=" + g.ordinal());
+            ConsoleUtils.printException(e, Core.NAME, "Can't create table structure for statistic '" + statistic.getName() + "' from plugin '" + statistic.getPluginName() + "'!");
         }
-        return false;
+    }
+
+    // CREATE THE HEAD OF THE INSERT INTO QUERY
+    public void createQueryHead(Statistic statistic) {
+        String tableName = getTableName(statistic);
+        // CREATE THE HEAD OF THE INSERT INTO QUERY
+        StringBuilder sBuilder = new StringBuilder("INSERT INTO `");
+        sBuilder.append(tableName);
+        sBuilder.append("`(");
+
+        // ADD ATTRIBUTES NAME
+        for (Entry<String, StatisticType> entry : statistic.getHead()) {
+            sBuilder.append('`');
+            sBuilder.append(entry.getKey());
+            sBuilder.append("`,");
+        }
+
+        // REPLACE LAST ',' WITH )
+        sBuilder.setCharAt(sBuilder.length() - 1, ')');
+        sBuilder.append(" VALUES ");
+
+        // SAVE THEM
+        insertHeads.put(statistic.getClass(), sBuilder.toString());
+    }
+
+    // FORMAT: PluginName_StatisticName
+    private String getTableName(Statistic statistic) {
+        return statistic.getPluginName() + "_" + statistic.getName();
     }
 }

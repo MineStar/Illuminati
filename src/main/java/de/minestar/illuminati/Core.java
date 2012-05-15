@@ -19,47 +19,27 @@
 
 package de.minestar.illuminati;
 
-import java.io.File;
-
-import org.bukkit.plugin.PluginManager;
-
 import de.minestar.illuminati.database.DatabaseHandler;
-import de.minestar.illuminati.listener.PListener;
-import de.minestar.illuminati.listener.ServerCommandListener;
-import de.minestar.illuminati.manager.PlayerManager;
+import de.minestar.illuminati.manager.StatisticManager;
 import de.minestar.minestarlibrary.AbstractCore;
+import de.minestar.minestarlibrary.stats.Statistic;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class Core extends AbstractCore {
 
-    private DatabaseHandler dbHandler;
-    private PlayerManager pManager;
+    public static final String NAME = "Illuminati";
 
-    private static Core instance;
+    private static DatabaseHandler dbHandler;
+    private static StatisticManager statManager;
 
     public Core() {
-        super("Illuminati");
+        super(NAME);
     }
 
     @Override
     protected boolean createManager() {
-        File dataFolder = getDataFolder();
-        dataFolder.mkdirs();
-
-        dbHandler = new DatabaseHandler(NAME, dataFolder);
-        pManager = new PlayerManager(dbHandler, dataFolder);
-        return true;
-    }
-
-    @Override
-    protected boolean registerEvents(PluginManager pm) {
-        pm.registerEvents(new PListener(pManager), this);
-        pm.registerEvents(new ServerCommandListener(pManager), this);
-        return true;
-    }
-
-    @Override
-    protected boolean commonEnable() {
-        instance = this;
+        dbHandler = new DatabaseHandler(NAME, getDataFolder());
+        statManager = new StatisticManager(dbHandler);
         return true;
     }
 
@@ -67,11 +47,22 @@ public class Core extends AbstractCore {
     protected boolean commonDisable() {
         dbHandler.closeConnection();
         dbHandler = null;
-        pManager = null;
         return true;
     }
 
-    public static Core getInstance() {
-        return instance;
+    public static void registerStatistic(Class<? extends Statistic> statistic) {
+        try {
+            if (dbHandler != null && dbHandler.hasConnection())
+                statManager.registerStatistic(statistic.newInstance());
+            else
+                ConsoleUtils.printError(NAME, "Can't register statistic for plugin " + statistic.getName() + "! Reason: No database connection");
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, NAME, "Can't create an instance of " + statistic + "!");
+        }
     }
+
+    public static void handleStatistic(Statistic statistic) {
+        statManager.handleStatistic(statistic);
+    }
+
 }
