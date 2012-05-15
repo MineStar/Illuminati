@@ -48,11 +48,18 @@ public class StatisticManager {
         queue.add(statistic);
         // DO WE HAVE TO RUN THE QUEUE?
         if (queue.size() >= BUFFER_SIZE)
-            flushQueue();
+            runQueue();
 
     }
 
-    private void flushQueue() {
+    public void flushQueue() {
+        if (queue.size() == 0)
+            return;
+        else
+            runQueue();
+    }
+
+    private void runQueue() {
         // MAP FOR ALL STATS SORTED BY THEIR CLASSES
         Map<Class<? extends Statistic>, List<Statistic>> map = new HashMap<Class<? extends Statistic>, List<Statistic>>();
         // TEMP VARIABLES
