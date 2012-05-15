@@ -18,12 +18,23 @@
 
 package de.minestar.illuminati.manager;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
 
 public class StatisticManager {
 
     private DatabaseHandler dbHandler;
+
+    private Queue<Statistic> queue = new LinkedBlockingQueue<Statistic>();
+
+    private static final int BUFFER_SIZE = 64;
 
     public StatisticManager(DatabaseHandler dbHandler) {
         this.dbHandler = dbHandler;
@@ -34,6 +45,38 @@ public class StatisticManager {
     }
 
     public void handleStatistic(Statistic statistic) {
+        queue.add(statistic);
+        // DO WE HAVE TO RUN THE QUEUE?
+        if (queue.size() >= BUFFER_SIZE)
+            flushQueue();
+
+    }
+
+    private void flushQueue() {
+        // MAP FOR ALL STATS SORTED BY THEIR CLASSES
+        Map<Class<? extends Statistic>, List<Statistic>> map = new HashMap<Class<? extends Statistic>, List<Statistic>>();
+        // TEMP VARIABLES
+        List<Statistic> list = null;
+        Statistic stat = null;
+
+        // FLUSHING THE QUEUE
+        while (!queue.isEmpty()) {
+            // GET FIRST STAT
+            stat = queue.poll();
+            // GET LIST FOR THIS CLASS
+            list = map.get(stat.getClass());
+            // FIRST ELEMENT OF THIS CLASS - CREATE A NEW LIST
+            if (list == null) {
+                list = new LinkedList<Statistic>();
+                map.put(stat.getClass(), list);
+            }
+            // ADD STAT TO LIST
+            list.add(stat);
+        }
+
+        // SAVE ALL STATS IN DATABASE
+        for (List<Statistic> stats : map.values())
+            dbHandler.storeStatistics(stats);
 
     }
 

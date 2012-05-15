@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -157,5 +158,61 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     // FORMAT: PluginName_StatisticName
     private String getTableName(Statistic statistic) {
         return statistic.getPluginName() + "_" + statistic.getName();
+    }
+
+    // ****************************************
+    // ********* STORTING STATISTICS **********
+    // ****************************************
+
+    public void storeStatistics(List<Statistic> stats) {
+        // SHOULD NOT HAPPEN
+        if (stats.isEmpty()) {
+            ConsoleUtils.printError(Core.NAME, "List empty!");
+            return;
+        }
+
+        // MISSING HEAD - SHOULD NOT HAPPEN!
+        String head = insertHeads.get(stats.get(0));
+        if (head == null) {
+            ConsoleUtils.printError(Core.NAME, "No insert head for " + stats.get(0).getClass());
+            return;
+        }
+
+        // ADDING THE VALUES TO THE INSERT INTO
+        StringBuilder sBuilder = new StringBuilder(head);
+        for (Statistic stat : stats) {
+            sBuilder.append('(');
+            sBuilder.append(getValueString(stat));
+            sBuilder.append(')');
+        }
+
+        // REPLACE LAST ) with a commata
+        sBuilder.setCharAt(sBuilder.length() - 1, ';');
+
+        // SEND THE QUERY TO THE DATABASE
+        storeStatistic(sBuilder.toString());
+    }
+
+    private void storeStatistic(String query) {
+        try {
+            dbConnection.getConnection().createStatement().executeUpdate(query);
+        } catch (Exception e) {
+            ConsoleUtils.printException(e, Core.NAME, "Can't save the statistics in the database!");
+        }
+    }
+
+    private String getValueString(Statistic statistic) {
+        Object[] data = statistic.getHead();
+        StringBuilder sBuilder = new StringBuilder();
+        for (Object o : data) {
+            sBuilder.append('\'');
+            sBuilder.append(o);
+            sBuilder.append('\'');
+
+            sBuilder.append(',');
+        }
+        sBuilder.deleteCharAt(sBuilder.length() - 1);
+
+        return sBuilder.toString();
     }
 }
