@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import de.minestar.illuminati.Core;
+import de.minestar.illuminati.IlluminatiCore;
 import de.minestar.minestarlibrary.config.MinestarConfig;
 import de.minestar.minestarlibrary.database.AbstractDatabaseHandler;
 import de.minestar.minestarlibrary.database.DatabaseConnection;
@@ -80,7 +80,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             if (tables.isEmpty())
                 tables = null;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't load table names from database!");
+            ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't load table names from database!");
         }
     }
 
@@ -125,10 +125,10 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
             // EXECUTE THE QUERY
             dbConnection.getConnection().createStatement().execute(sBuilder.toString());
-            ConsoleUtils.printInfo(Core.NAME, "Statistic '" + statistic.getName() + "' from '" + statistic.getPluginName() + "' firstly registered!");
+            ConsoleUtils.printInfo(IlluminatiCore.NAME, "Statistic '" + statistic.getName() + "' from '" + statistic.getPluginName() + "' firstly registered!");
 
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't create table structure for statistic '" + statistic.getName() + "' from plugin '" + statistic.getPluginName() + "'!");
+            ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't create table structure for statistic '" + statistic.getName() + "' from plugin '" + statistic.getPluginName() + "'!");
         }
     }
 
@@ -167,7 +167,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     public void storeStatistics(List<Statistic> stats) {
         // SHOULD NOT HAPPEN
         if (stats.isEmpty()) {
-            ConsoleUtils.printError(Core.NAME, "List empty!");
+            ConsoleUtils.printError(IlluminatiCore.NAME, "List empty!");
             return;
         }
 
@@ -175,7 +175,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
         String head = insertHeads.get(stats.get(0).getClass());
         if (head == null) {
-            ConsoleUtils.printError(Core.NAME, "No insert head for " + stats.get(0).getClass());
+            ConsoleUtils.printError(IlluminatiCore.NAME, "No insert head for " + stats.get(0).getClass());
             return;
         }
 
@@ -198,7 +198,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         try {
             dbConnection.getConnection().createStatement().executeUpdate(query);
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't save the statistics in the database!");
+            ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't save the statistics in the database!");
         }
     }
 

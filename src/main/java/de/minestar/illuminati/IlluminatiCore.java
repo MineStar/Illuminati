@@ -29,14 +29,14 @@ import de.minestar.minestarlibrary.AbstractCore;
 import de.minestar.minestarlibrary.stats.Statistic;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class Core extends AbstractCore {
+public class IlluminatiCore extends AbstractCore {
 
     public static final String NAME = "Illuminati";
 
     private static DatabaseHandler dbHandler;
     private static StatisticManager statManager;
 
-    public Core() {
+    public IlluminatiCore() {
         super(NAME);
     }
 

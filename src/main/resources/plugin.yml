@@ -1,5 +1,5 @@
 name: Illuminati
-main: de.minestar.illuminati.Core
+main: de.minestar.illuminati.IlluminatiCore
 version: ${pom.version}
 depend: [GroupManager, FalseBookCore, MineStarLibrary]
 load: STARTUP

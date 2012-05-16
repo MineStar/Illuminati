@@ -43,7 +43,7 @@ public class Settings {
 //                loadValues(MinestarConfig.copyDefault("/config.yml", configFile));
             return true;
         } catch (Exception e) {
-            ConsoleUtils.printException(e, Core.NAME, "Can't load the settings from " + configFile);
+            ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't load the settings from " + configFile);
             return false;
         }
     }
