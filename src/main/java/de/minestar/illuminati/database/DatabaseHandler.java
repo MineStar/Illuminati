@@ -99,7 +99,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
     // CHECK IF THERE IS A TABLE FOR THE STATISTIC
     public boolean isStatTableExisting(Statistic statistic) {
-        return tables != null && tables.contains(getTableName(statistic));
+        return tables != null && tables.contains(getTableName(statistic).toLowerCase());
     }
 
     // GENERATE A TABLE WHICH STORES THE STATISTICS DATA
@@ -172,7 +172,8 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         }
 
         // MISSING HEAD - SHOULD NOT HAPPEN!
-        String head = insertHeads.get(stats.get(0));
+
+        String head = insertHeads.get(stats.get(0).getClass());
         if (head == null) {
             ConsoleUtils.printError(Core.NAME, "No insert head for " + stats.get(0).getClass());
             return;
@@ -183,7 +184,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         for (Statistic stat : stats) {
             sBuilder.append('(');
             sBuilder.append(getValueString(stat));
-            sBuilder.append(')');
+            sBuilder.append("),");
         }
 
         // REPLACE LAST ) with a commata
@@ -202,7 +203,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     }
 
     private String getValueString(Statistic statistic) {
-        Object[] data = statistic.getHead();
+        List<Object> data = statistic.getData();
         StringBuilder sBuilder = new StringBuilder();
         for (Object o : data) {
             sBuilder.append('\'');
