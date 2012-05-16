@@ -19,6 +19,10 @@
 
 package de.minestar.illuminati;
 
+import java.io.File;
+
+import org.bukkit.scheduler.BukkitScheduler;
+
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.illuminati.manager.StatisticManager;
 import de.minestar.minestarlibrary.AbstractCore;
@@ -37,6 +41,11 @@ public class Core extends AbstractCore {
     }
 
     @Override
+    protected boolean loadingConfigs(File dataFolder) {
+        return Settings.init(dataFolder);
+    }
+
+    @Override
     protected boolean createManager() {
         dbHandler = new DatabaseHandler(NAME, getDataFolder());
         statManager = new StatisticManager(dbHandler);
@@ -44,8 +53,15 @@ public class Core extends AbstractCore {
     }
 
     @Override
+    protected boolean startThreads(BukkitScheduler scheduler) {
+        scheduler.scheduleAsyncRepeatingTask(this, statManager, 20L * 60L, Settings.QUEUE_INTERVALL * 20L);
+        return true;
+    }
+
+    @Override
     protected boolean commonDisable() {
-        ConsoleUtils.printInfo(NAME, "Flush the queue");
+//        ConsoleUtils.printInfo(NAME, "Flush the queue");
+        System.out.println("[" + NAME + "] Flush the queue");
         statManager.flushQueue();
 
         dbHandler.closeConnection();

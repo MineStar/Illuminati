@@ -25,16 +25,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import de.minestar.illuminati.Settings;
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
 
-public class StatisticManager {
+public class StatisticManager implements Runnable {
 
     private DatabaseHandler dbHandler;
 
     private Queue<Statistic> queue = new LinkedBlockingQueue<Statistic>();
 
-    private static final int BUFFER_SIZE = 64;
+    private static final int BUFFER_SIZE = Settings.BUFFER_SIZE;
 
     public StatisticManager(DatabaseHandler dbHandler) {
         this.dbHandler = dbHandler;
@@ -46,10 +47,14 @@ public class StatisticManager {
 
     public void handleStatistic(Statistic statistic) {
         queue.add(statistic);
+
+    }
+
+    @Override
+    public void run() {
         // DO WE HAVE TO RUN THE QUEUE?
         if (queue.size() >= BUFFER_SIZE)
             runQueue();
-
     }
 
     public void flushQueue() {
