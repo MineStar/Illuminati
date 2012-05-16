@@ -1,8 +1,5 @@
 name: Illuminati
 main: de.minestar.illuminati.Core
-version: 0.1
-depend: [GroupManager, FalseBookCore]
-commands:
-  illu:
-    description: Illuminati related events
-    usage: /illu
+version: ${pom.version}
+depend: [GroupManager, FalseBookCore, MineStarLibrary]
+load: STARTUP
