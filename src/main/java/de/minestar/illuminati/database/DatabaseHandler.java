@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import de.minestar.illuminati.IlluminatiCore;
 import de.minestar.minestarlibrary.config.MinestarConfig;
@@ -202,12 +203,21 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         }
     }
 
+    // REPLACER FOR ESCAPING SPECIAL CHARACTERS
+    private static Pattern ESCAPE_APOSTROPHE = Pattern.compile("'");
+    private static Pattern ESCAPE_BACKSLASH = Pattern.compile("\\");
+
     private String getValueString(Statistic statistic) {
         List<Object> data = statistic.getData();
         StringBuilder sBuilder = new StringBuilder();
         for (Object o : data) {
             sBuilder.append('\'');
-            sBuilder.append(o);
+            String value = o.toString();
+            // REPLACE A ' WITH \'
+            value = ESCAPE_APOSTROPHE.matcher(value).replaceAll("\\\\'");
+            // REPLACE A \ WITH \\
+            value = ESCAPE_BACKSLASH.matcher(value).replaceAll("\\\\\\\\");
+            sBuilder.append(value);
             sBuilder.append('\'');
 
             sBuilder.append(',');
@@ -216,4 +226,5 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
         return sBuilder.toString();
     }
+
 }
