@@ -115,7 +115,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
             // ALWAYS HAVE AN ID
             sBuilder.append("` ( `id` INT NOT NULL AUTO_INCREMENT , ");
             // ITERATE THROUGH THE ATTRIBUTES
-            for (Entry<String, StatisticType> entry : statistic.getHead()) {
+            for (Entry<String, StatisticType> entry : statistic.getHead().entrySet()) {
                 sBuilder.append('`');
                 sBuilder.append(entry.getKey());
                 sBuilder.append("` ");
@@ -142,7 +142,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
         sBuilder.append("`(");
 
         // ADD ATTRIBUTES NAME
-        for (Entry<String, StatisticType> entry : statistic.getHead()) {
+        for (Entry<String, StatisticType> entry : statistic.getHead().entrySet()) {
             sBuilder.append('`');
             sBuilder.append(entry.getKey());
             sBuilder.append("`,");
@@ -205,7 +205,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
 
     // REPLACER FOR ESCAPING SPECIAL CHARACTERS
     private static Pattern ESCAPE_APOSTROPHE = Pattern.compile("'");
-    private static Pattern ESCAPE_BACKSLASH = Pattern.compile("\\");
+    private static Pattern ESCAPE_BACKSLASH = Pattern.compile("\\\\");
 
     private String getValueString(Statistic statistic) {
         List<Object> data = statistic.getData();

@@ -60,8 +60,7 @@ public class IlluminatiCore extends AbstractCore {
 
     @Override
     protected boolean commonDisable() {
-//        ConsoleUtils.printInfo(NAME, "Flush the queue");
-        System.out.println("[" + NAME + "] Flush the queue");
+        ConsoleUtils.printInfo(NAME, "Flush the queue");
         statManager.flushQueue();
 
         dbHandler.closeConnection();
