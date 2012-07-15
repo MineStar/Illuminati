@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -208,7 +209,7 @@ public class DatabaseHandler extends AbstractDatabaseHandler {
     private static Pattern ESCAPE_BACKSLASH = Pattern.compile("\\\\");
 
     private String getValueString(Statistic statistic) {
-        List<Object> data = statistic.getData();
+        Queue<Object> data = statistic.getData();
         StringBuilder sBuilder = new StringBuilder();
         for (Object o : data) {
             sBuilder.append('\'');
