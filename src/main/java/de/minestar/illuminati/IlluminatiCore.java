@@ -74,7 +74,9 @@ public class IlluminatiCore extends AbstractCore {
                 statManager.registerStatistic(statistic.newInstance());
             else
                 ConsoleUtils.printError(NAME, "Can't register statistic for plugin " + statistic.getName() + "! Reason: No database connection");
-        } catch (Exception e) {
+        } catch (IllegalAccessException e) {
+            ConsoleUtils.printException(e, NAME, "Can't create an instance of " + statistic + "!");
+        } catch (InstantiationException e) {
             ConsoleUtils.printException(e, NAME, "Can't create an instance of " + statistic + "!");
         }
     }
