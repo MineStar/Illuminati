@@ -31,34 +31,19 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import de.minestar.illuminati.IlluminatiCore;
-import de.minestar.minestarlibrary.config.MinestarConfig;
-import de.minestar.minestarlibrary.database.AbstractDatabaseHandler;
-import de.minestar.minestarlibrary.database.DatabaseConnection;
-import de.minestar.minestarlibrary.database.DatabaseType;
-import de.minestar.minestarlibrary.database.DatabaseUtils;
+import de.minestar.minestarlibrary.database.AbstractMySQLHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
 import de.minestar.minestarlibrary.stats.StatisticType;
 import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
-public class DatabaseHandler extends AbstractDatabaseHandler {
+public class DatabaseHandler extends AbstractMySQLHandler {
 
     private Set<String> tables = new HashSet<String>();
     private Map<Class<? extends Statistic>, String> insertHeads = new HashMap<Class<? extends Statistic>, String>();
 
-    public DatabaseHandler(String pluginName, File dataFolder) {
-        super(pluginName, dataFolder);
+    public DatabaseHandler(String pluginName, File SQLConfigFile) {
+        super(pluginName, SQLConfigFile);
         this.loadTableNames();
-    }
-
-    @Override
-    protected DatabaseConnection createConnection(String pluginName, File dataFolder) throws Exception {
-        File configFile = new File(dataFolder, "sqlconfig.yml");
-        if (!configFile.exists())
-            DatabaseUtils.createDatabaseConfig(DatabaseType.MySQL, configFile, pluginName);
-        else
-            return new DatabaseConnection(pluginName, DatabaseType.MySQL, new MinestarConfig(configFile));
-
-        return null;
     }
 
     @Override

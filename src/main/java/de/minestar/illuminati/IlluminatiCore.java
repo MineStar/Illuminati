@@ -47,7 +47,7 @@ public class IlluminatiCore extends AbstractCore {
 
     @Override
     protected boolean createManager() {
-        dbHandler = new DatabaseHandler(NAME, getDataFolder());
+        dbHandler = new DatabaseHandler(NAME, new File(getDataFolder(), "sqlconfig.yml"));
         statManager = new StatisticManager(dbHandler);
         return true;
     }
