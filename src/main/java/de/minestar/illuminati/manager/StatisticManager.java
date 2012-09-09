@@ -28,12 +28,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 import de.minestar.illuminati.Settings;
 import de.minestar.illuminati.database.DatabaseHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
+import de.minestar.minestarlibrary.stats.UpdateableStatistic;
 
 public class StatisticManager implements Runnable {
 
     private DatabaseHandler dbHandler;
 
-    private Queue<Statistic> queue = new LinkedBlockingQueue<Statistic>();
+    private Queue<Statistic> normalQueue = new LinkedBlockingQueue<Statistic>();
+
+    private Queue<UpdateableStatistic> updateQueue = new LinkedBlockingQueue<UpdateableStatistic>();
 
     private static final int BUFFER_SIZE = Settings.BUFFER_SIZE;
 
@@ -45,51 +48,79 @@ public class StatisticManager implements Runnable {
         dbHandler.registerStatistic(statistic);
     }
 
-    public void handleStatistic(Statistic statistic) {
-        queue.add(statistic);
-
+    public synchronized void handleStatistic(Statistic statistic) {
+        if (statistic instanceof UpdateableStatistic)
+            updateQueue.add((UpdateableStatistic) statistic);
+        else
+            normalQueue.add(statistic);
     }
 
     @Override
     public void run() {
         // DO WE HAVE TO RUN THE QUEUE?
-        if (queue.size() >= BUFFER_SIZE)
-            runQueue();
+        if (normalQueue.size() >= BUFFER_SIZE)
+            runNormalQueue();
+
+        if (updateQueue.size() >= BUFFER_SIZE)
+            runUpdateQueue();
     }
 
     public void flushQueue() {
-        if (queue.size() == 0)
-            return;
-        else
-            runQueue();
+        if (normalQueue.size() != 0)
+            runNormalQueue();
+        if (updateQueue.size() != 0)
+            runUpdateQueue();
+
     }
 
-    private void runQueue() {
+    private void runNormalQueue() {
         // MAP FOR ALL STATS SORTED BY THEIR CLASSES
         Map<Class<? extends Statistic>, List<Statistic>> map = new HashMap<Class<? extends Statistic>, List<Statistic>>();
         // TEMP VARIABLES
         List<Statistic> list = null;
-        Statistic stat = null;
 
-        // FLUSHING THE QUEUE
-        while (!queue.isEmpty()) {
-            // GET FIRST STAT
-            stat = queue.poll();
+        for (Statistic statistic : normalQueue) {
             // GET LIST FOR THIS CLASS
-            list = map.get(stat.getClass());
+            list = map.get(statistic.getClass());
             // FIRST ELEMENT OF THIS CLASS - CREATE A NEW LIST
             if (list == null) {
                 list = new LinkedList<Statistic>();
-                map.put(stat.getClass(), list);
+                map.put(statistic.getClass(), list);
             }
             // ADD STAT TO LIST
-            list.add(stat);
+            list.add(statistic);
         }
+
+        normalQueue.clear();
 
         // SAVE ALL STATS IN DATABASE
         for (List<Statistic> stats : map.values())
-            dbHandler.storeStatistics(stats);
+            dbHandler.storeNormalStatistics(stats);
 
     }
 
+    private void runUpdateQueue() {
+        // MAP FOR ALL STATS SORTED BY THEIR CLASSES
+        Map<Class<? extends UpdateableStatistic>, List<UpdateableStatistic>> map = new HashMap<Class<? extends UpdateableStatistic>, List<UpdateableStatistic>>();
+        // TEMP VARIABLES
+        List<UpdateableStatistic> list = null;
+
+        for (UpdateableStatistic statistic : updateQueue) {
+            // GET LIST FOR THIS CLASS
+            list = map.get(statistic.getClass());
+            // FIRST ELEMENT OF THIS CLASS - CREATE A NEW LIST
+            if (list == null) {
+                list = new LinkedList<UpdateableStatistic>();
+                map.put(statistic.getClass(), list);
+            }
+            // ADD STAT TO LIST
+            list.add(statistic);
+        }
+
+        normalQueue.clear();
+
+        // SAVE ALL STATS IN DATABASE
+        for (List<UpdateableStatistic> stats : map.values())
+            dbHandler.storeUpdateableStatistics(stats);
+    }
 }
