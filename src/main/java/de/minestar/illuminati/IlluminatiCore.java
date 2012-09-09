@@ -84,9 +84,4 @@ public class IlluminatiCore extends AbstractCore {
     public static void handleStatistic(Statistic statistic) {
         statManager.handleStatistic(statistic);
     }
-    
-//    public static void registerStatistic(Class<? extends UpdateableStatistic> statistic) {
-//        
-//    }
-
 }
