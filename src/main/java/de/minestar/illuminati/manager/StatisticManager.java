@@ -18,6 +18,8 @@
 
 package de.minestar.illuminati.manager;
 
+import static de.minestar.illuminati.IlluminatiCore.dbHandler;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,10 +27,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import de.minestar.illuminati.IlluminatiCore;
 import de.minestar.illuminati.Settings;
-import static de.minestar.illuminati.IlluminatiCore.dbHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
 import de.minestar.minestarlibrary.stats.UpdateableStatistic;
+import de.minestar.minestarlibrary.utils.ConsoleUtils;
 
 public class StatisticManager implements Runnable {
 
@@ -60,10 +63,15 @@ public class StatisticManager implements Runnable {
     }
 
     public void flushQueue() {
-        if (normalQueue.size() != 0)
+        if (normalQueue.size() != 0) {
+            ConsoleUtils.printInfo(IlluminatiCore.NAME, "Flush normal statistic queue. Remaining queued statistics: " + normalQueue.size());
             runNormalQueue();
-        if (updateQueue.size() != 0)
+
+        }
+        if (updateQueue.size() != 0) {
+            ConsoleUtils.printInfo(IlluminatiCore.NAME, "Flush updateable statistic queue. Remaining queued statistics: " + updateQueue.size());
             runUpdateQueue();
+        }
 
     }
 

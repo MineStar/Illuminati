@@ -130,20 +130,21 @@ public class DatabaseHandler extends AbstractMySQLHandler {
             // IF STATISTIC IS UPDATEABLE ADD A KEY FOR FASTER SEARCH
             if (statistic instanceof UpdateableStatistic) {
                 UpdateableStatistic uStatistic = (UpdateableStatistic) statistic;
+
+                // ADD KEY TYPE
                 sBuilder.append('`');
                 sBuilder.append(uStatistic.getKeyName());
                 sBuilder.append("` ");
-
-                sBuilder.append(", ");
                 sBuilder.append(uStatistic.getKeyType().getName());
+                sBuilder.append(", ");
 
                 // ADD INDEX
                 StatisticType type = uStatistic.getKeyType();
                 // TEXT COLOMS ALWAYS NEED A KEY LENGTH - LENGTH IS 32
                 if (type.equals(StatisticType.STRING))
-                    sBuilder.append("INDEX `index` (`" + uStatistic.getKeyName() + "`(32)), ");
+                    sBuilder.append(" INDEX `index` (`" + uStatistic.getKeyName() + "`(32)), ");
                 else
-                    sBuilder.append("INDEX `index` (`" + uStatistic.getKeyName() + "`), ");
+                    sBuilder.append(" INDEX `index` (`" + uStatistic.getKeyName() + "`), ");
             }
 
             sBuilder.append("PRIMARY KEY (`id`)) ENGINE = InnoDB;");
@@ -320,6 +321,9 @@ public class DatabaseHandler extends AbstractMySQLHandler {
         Queue<Object> data = statistic.getData();
         StringBuilder sBuilder = new StringBuilder();
         for (Object o : data) {
+            if (o instanceof Boolean) {
+                o = ((Boolean) o) ? 1 : 0;
+            }
             sBuilder.append(maskValue(o));
             sBuilder.append(',');
         }
@@ -374,7 +378,7 @@ public class DatabaseHandler extends AbstractMySQLHandler {
         } catch (Exception e) {
             ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't save the updateable statistics in the database!");
         }
-        // ALWAYS ACITIVE AUTO COMMIT!
+        // ALWAYS ACTIVATE AUTO COMMIT!
         finally {
             try {
                 dbConnection.getConnection().setAutoCommit(true);
