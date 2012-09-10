@@ -117,7 +117,7 @@ public class StatisticManager implements Runnable {
             list.add(statistic);
         }
 
-        normalQueue.clear();
+        updateQueue.clear();
 
         // SAVE ALL STATS IN DATABASE
         for (List<UpdateableStatistic> stats : map.values())
