@@ -40,7 +40,6 @@ public class Settings {
                 loadValues(new MinestarConfig(configFile));
             else
                 loadValues(MinestarConfig.copyDefault(Settings.class.getResourceAsStream("/config.yml"), configFile));
-//                loadValues(MinestarConfig.copyDefault("/config.yml", configFile));
             return true;
         } catch (Exception e) {
             ConsoleUtils.printException(e, IlluminatiCore.NAME, "Can't load the settings from " + configFile);

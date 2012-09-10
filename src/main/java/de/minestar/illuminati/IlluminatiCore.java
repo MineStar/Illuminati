@@ -33,8 +33,8 @@ public class IlluminatiCore extends AbstractCore {
 
     public static final String NAME = "Illuminati";
 
-    private static DatabaseHandler dbHandler;
-    private static StatisticManager statManager;
+    public static DatabaseHandler dbHandler;
+    public static StatisticManager statManager;
 
     public IlluminatiCore() {
         super(NAME);
@@ -48,7 +48,10 @@ public class IlluminatiCore extends AbstractCore {
     @Override
     protected boolean createManager() {
         dbHandler = new DatabaseHandler(NAME, new File(getDataFolder(), "sqlconfig.yml"));
-        statManager = new StatisticManager(dbHandler);
+        if (!dbHandler.hasConnection())
+            return false;
+
+        statManager = new StatisticManager();
         return true;
     }
 
@@ -64,8 +67,7 @@ public class IlluminatiCore extends AbstractCore {
         statManager.flushQueue();
 
         dbHandler.closeConnection();
-        dbHandler = null;
-        return true;
+        return dbHandler != null && !dbHandler.hasConnection();
     }
 
     public static void registerStatistic(Class<? extends Statistic> statistic) {
@@ -74,9 +76,7 @@ public class IlluminatiCore extends AbstractCore {
                 statManager.registerStatistic(statistic.newInstance());
             else
                 ConsoleUtils.printError(NAME, "Can't register statistic for plugin " + statistic.getName() + "! Reason: No database connection");
-        } catch (IllegalAccessException e) {
-            ConsoleUtils.printException(e, NAME, "Can't create an instance of " + statistic + "!");
-        } catch (InstantiationException e) {
+        } catch (Exception e) {
             ConsoleUtils.printException(e, NAME, "Can't create an instance of " + statistic + "!");
         }
     }

@@ -26,23 +26,17 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import de.minestar.illuminati.Settings;
-import de.minestar.illuminati.database.DatabaseHandler;
+import static de.minestar.illuminati.IlluminatiCore.dbHandler;
 import de.minestar.minestarlibrary.stats.Statistic;
 import de.minestar.minestarlibrary.stats.UpdateableStatistic;
 
 public class StatisticManager implements Runnable {
-
-    private DatabaseHandler dbHandler;
 
     private Queue<Statistic> normalQueue = new LinkedBlockingQueue<Statistic>();
 
     private Queue<UpdateableStatistic> updateQueue = new LinkedBlockingQueue<UpdateableStatistic>();
 
     private static final int BUFFER_SIZE = Settings.BUFFER_SIZE;
-
-    public StatisticManager(DatabaseHandler dbHandler) {
-        this.dbHandler = dbHandler;
-    }
 
     public void registerStatistic(Statistic statistic) {
         dbHandler.registerStatistic(statistic);
