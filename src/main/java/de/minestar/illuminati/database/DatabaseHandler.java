@@ -80,12 +80,6 @@ public class DatabaseHandler extends AbstractMySQLHandler {
     // REGISTER THE STATISTICS
     public void registerStatistic(Statistic statistic) {
 
-        // DATA.SIZE != HEAD.SIZE
-        if (!hasEnoughValuesDefined(statistic)) {
-            ConsoleUtils.printError(pluginName, "The count of values is not the same as the count of coloms for the statistic '" + statistic + "'!");
-            return;
-        }
-
         // DO WE HAVE TO CREATE A TABLE FOR IT?
         if (!isStatTableExisting(statistic))
             createStatTable(statistic);
@@ -96,10 +90,6 @@ public class DatabaseHandler extends AbstractMySQLHandler {
         // CREATEA A HEAD FOR THE INSERT QUERY
         else
             createQueryHead(statistic);
-    }
-
-    private boolean hasEnoughValuesDefined(Statistic statistic) {
-        return statistic.getData().size() == statistic.getHead().size();
     }
 
     // CHECK IF THERE IS A TABLE FOR THE STATISTIC
