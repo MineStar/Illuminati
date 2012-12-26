@@ -57,7 +57,7 @@ public class IlluminatiCore extends AbstractCore {
 
     @Override
     protected boolean startThreads(BukkitScheduler scheduler) {
-        scheduler.scheduleAsyncRepeatingTask(this, statManager, 20L * 60L, Settings.QUEUE_INTERVALL * 20L);
+        scheduler.runTaskTimerAsynchronously(this, statManager, 20L * 60L, Settings.QUEUE_INTERVALL * 20L);
         return true;
     }
 
