@@ -1,9 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.minestar</groupId>
 	<artifactId>Illuminati</artifactId>
-	<version>1.4.6_1</version>
 	<name>Illuminati</name>
 	<distributionManagement>
 		<!-- use the following if you're not using a snapshot version. -->
@@ -23,7 +21,7 @@
 		<dependency>
 			<groupId>de.minestar</groupId>
 			<artifactId>MineStarLibrary</artifactId>
-			<version>1.4.6_1</version>
+			<version>1.5.1_R2</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -45,4 +43,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<parent>
+		<groupId>de.minestar</groupId>
+		<artifactId>MinestarPlugins</artifactId>
+		<version>1.5.1_R2</version>
+		<relativePath>../MinestarPlugins</relativePath>
+	</parent>
 </project>
