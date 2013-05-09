@@ -1,5 +1,5 @@
 name: Illuminati
 main: de.minestar.illuminati.IlluminatiCore
-version: 1.5.1_R2
+version: 1.5.2_R1-SNAPSHOT
 depend: [GroupManager, FalseBookCore, MineStarLibrary]
 load: STARTUP
